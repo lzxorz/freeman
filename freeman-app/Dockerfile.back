@@ -1,0 +1,27 @@
+# 基础镜像
+# FROM openjdk:8-jdk-alpine
+FROM java:8
+
+# 作者信息 不推荐使用的指令
+# MAINTAINER "lzxorz@163.com"
+
+LABEL name=freeman description="Freeman后台管理系统"
+
+# 在宿主机的“/var/lib/docker”下创建一个临时文件，并将其挂载到容器的“/tmp”
+VOLUME /tmp
+
+# 容器对宿主机暴露端口
+EXPOSE 9081
+
+# 添加变量，如果使用dockerfile-maven-plugin，则会自动替换这里的变量内容
+ARG JAR_FILE=target/freeman-app.jar
+
+# 往容器中添加jar包
+ADD ${JAR_FILE} app.jar
+
+# 启动镜像自动运行程序
+ENTRYPOINT [ "java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+
+# 构建 docker build -t freeman:test .
+# 预览效果
+# 创建容器并启动,关闭时 清除容器 docker run -it --rm -p 9081:9081 --name freeman-app freeman:test
