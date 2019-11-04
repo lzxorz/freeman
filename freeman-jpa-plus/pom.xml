@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>freeman-jpa-plus</artifactId>
-    <version>3.0.0.RELEASE</version>
+    <version>1.0.0.RELEASE</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>spring-data-jpa dynamic native query.</description>

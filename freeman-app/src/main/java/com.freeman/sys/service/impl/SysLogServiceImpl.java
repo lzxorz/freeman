@@ -42,10 +42,11 @@ public class SysLogServiceImpl extends BaseServiceImpl<SysLogRepository, SysLog,
         Object createTime = sysLog.getParams("createTime"); //传进来是数组
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
+                .from("sys_log")
             .eq("username", sysLog.getUsername())
             .contains("operation", sysLog.getOperation())
             .contains("location", sysLog.getLocation())
-            .between(Objects.nonNull(createTime), "create_time", ((Object[]) createTime)[0], ((Object[]) createTime)[1])
+            .between( "date_format(create_time,'%Y-%m-%d')", createTime)
             .build();
 
         return dao.findAllByNativeSql(nativeSql, SysLog.class, pageRequest);

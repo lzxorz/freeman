@@ -60,8 +60,9 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserRepository, SysUs
             .eq("su.sex", user.getSex())
             .eq("su.dept_id", user.getDeptId())
             .eq("su.status", user.getStatus())
-            .between(Objects.nonNull(createTime), "date_format(su.create_time,'%Y-%m-%d')", ((Object[]) createTime)[0], ((Object[]) createTime)[1])
+            .between( "date_format(su.create_time,'%Y-%m-%d')", createTime)
             .sqlStrPart((String)user.getParams("dataScope"))
+            .groupBy("su.id")
             .build();
 
         return dao.findAllByNativeSql(nativeSql, SysUser.class, pageable);

@@ -61,42 +61,42 @@ public class NativeSqlQuery {
     /** where 条件 begin */
     public NativeSqlQuery eq(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " = " + wrapp(value));
+            whereSegment.add(columnName + " = " + wrappValue(value));
         }
         return this;
     }
 
     public NativeSqlQuery ne(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " != " + wrapp(value));
+            whereSegment.add(columnName + " != " + wrappValue(value));
         }
         return this;
     }
     
     public NativeSqlQuery lt(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " < " + wrapp(value));
+            whereSegment.add(columnName + " < " + wrappValue(value));
         }
         return this;
     }
 
     public NativeSqlQuery lte(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " <= " + wrapp(value));
+            whereSegment.add(columnName + " <= " + wrappValue(value));
         }
         return this;
     }
 
     public NativeSqlQuery gt(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " > " + wrapp(value));
+            whereSegment.add(columnName + " > " + wrappValue(value));
         }
         return this;
     }
 
     public NativeSqlQuery gte(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " >= " + wrapp(value));
+            whereSegment.add(columnName + " >= " + wrappValue(value));
         }
         return this;
     }
@@ -113,91 +113,113 @@ public class NativeSqlQuery {
 
     /*public NativeSqlQuery like(boolean condition, String columnName, Object value){
         if (condition && Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE " + wrapp(value));
+            whereSegment.add(columnName + " LIKE " + wrappValue(value));
         }
         return this;
     }*/
     public NativeSqlQuery startsWith(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE " + wrapp(value) + "%");
+            whereSegment.add(columnName + " LIKE " + wrappValue(value) + "%");
         }
         return this;
     }
     public NativeSqlQuery contains(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE %" + wrapp(value) + "%");
+            whereSegment.add(columnName + " LIKE %" + wrappValue(value) + "%");
         }
         return this;
     }
     public NativeSqlQuery endsWith(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE %" + wrapp(value));
+            whereSegment.add(columnName + " LIKE %" + wrappValue(value));
         }
         return this;
     }
     /*public NativeSqlQuery notLike(boolean condition, String columnName, Object value) {
         if (condition && Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE " + wrapp(value));
+            whereSegment.add(columnName + " NOT LIKE " + wrappValue(value));
         }
         return this;
     }*/
     public NativeSqlQuery notStartsWith(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE " + wrapp(value) + "%");
+            whereSegment.add(columnName + " NOT LIKE " + wrappValue(value) + "%");
         }
         return this;
     }
     public NativeSqlQuery notContains(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE %" + wrapp(value) + "%");
+            whereSegment.add(columnName + " NOT LIKE %" + wrappValue(value) + "%");
         }
         return this;
     }
     public NativeSqlQuery notEndsWith(String columnName, Object value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE %" + wrapp(value));
+            whereSegment.add(columnName + " NOT LIKE %" + wrappValue(value));
         }
         return this;
     }
 
     public NativeSqlQuery in(String columnName, Object... value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " IN ("+ wrapp(value) +")");
+            whereSegment.add(columnName + " IN ("+ wrappValue(value) +")");
         }
         return this;
     }
 
     public NativeSqlQuery notIn(String columnName, Object... value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT IN ("+ wrapp(value) +")");
+            whereSegment.add(columnName + " NOT IN ("+ wrappValue(value) +")");
         }
         return this;
     }
 
     public NativeSqlQuery in(String columnName, Collection value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " IN ("+ wrapp(value) +")");
+            whereSegment.add(columnName + " IN ("+ wrappValue(value) +")");
         }
         return this;
     }
 
     public NativeSqlQuery notIn(String columnName, Collection value){
         if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT IN ("+ wrapp(value) +")");
+            whereSegment.add(columnName + " NOT IN ("+ wrappValue(value) +")");
         }
         return this;
     }
 
-    public NativeSqlQuery between(boolean condition, String columnName, Object value1, Object value2){
-        if (condition && Objects.nonNull(value1) && Objects.nonNull(value2)) {
-            whereSegment.add(columnName + " BETWEEN "+ wrapp(value1)+" AND "+ wrapp(value2));
+    public NativeSqlQuery between(String columnName, Object values){
+        if (Objects.nonNull(values)) {
+            Object value1,value2;
+            Object[] objects = null;
+            if (values.getClass().isArray() && ((Object[])values).length == 2) {
+                objects = ((Object[])values);
+            }  else if (values instanceof Collection && ((Collection)values).size() == 2) {
+                objects = ((Collection) values).toArray();
+            }
+            if (objects != null) {
+                value1 = objects[0];
+                value2 = objects[1];
+                whereSegment.add(columnName + " BETWEEN " + wrappValue(value1) + " AND " + wrappValue(value2));
+            }
         }
         return this;
     }
 
-    public NativeSqlQuery notBetween(boolean condition, String columnName, Object value1, Object value2){
-        if (condition && Objects.nonNull(value1) && Objects.nonNull(value2)) {
-            whereSegment.add(columnName + " NOT BETWEEN "+ wrapp(value1)+" AND "+ wrapp(value2));
+    public NativeSqlQuery notBetween(String columnName, Object values){
+        if (Objects.nonNull(values)) {
+            Object value1,value2;
+            Object[] objects = null;
+            if (values.getClass().isArray() && ((Object[])values).length == 2) {
+                objects = ((Object[])values);
+            }  else if (values instanceof Collection && ((Collection)values).size() == 2) {
+                objects = ((Collection) values).toArray();
+            }
+            if (objects != null) {
+                value1 = objects[0];
+                value2 = objects[1];
+                whereSegment.add(columnName + " NOT BETWEEN " + wrappValue(value1) + " AND " + wrappValue(value2));
+            }
         }
         return this;
     }
@@ -239,10 +261,10 @@ public class NativeSqlQuery {
         }
         if (whereSegment.length()>0) {
             sj.add("WHERE " + whereSegment.toString());
-            if (sqlStrPart.length()>0) {
+            if (StrUtil.isNotBlank(sqlStrPart)) {
                 sj.add(sqlStrPart);
             }
-        }else if (sqlStrPart.length()>0) {
+        }else if (StrUtil.isNotBlank(sqlStrPart)) {
             sj.add("WHERE " + sqlStrPart);
         }
         if (StrUtil.isNotBlank(groupBySegment)) {
@@ -260,7 +282,7 @@ public class NativeSqlQuery {
 
 
     /** 对值进行包装 */
-    private String wrapp(Object value) {
+    private String wrappValue(Object value) {
         String res = "";
         // Class<?> clazz = value.getClass();
         try {
@@ -305,14 +327,14 @@ public class NativeSqlQuery {
         String res = "()";
         if(valueArr.length>0){
             Class<?> type = valueArr.getClass().getComponentType();
-            StringJoiner sj = new StringJoiner(",","(",")");
+            StringJoiner sj = new StringJoiner(",");
             if(type == String.class){
                 for (Object v : valueArr) {
                     sj.add("'"+v.toString()+"'");
                 }
             }else {
                 for (Object v : valueArr) {
-                    sj.add(wrapp(v));
+                    sj.add(wrappValue(v));
                 }
             }
             res = sj.toString();
@@ -324,13 +346,13 @@ public class NativeSqlQuery {
         String res = "()";
         Iterator iterator =  value.iterator();
         if (iterator.hasNext()){
-            StringJoiner sj = new StringJoiner(",","(",")");
+            StringJoiner sj = new StringJoiner(",");
             while (iterator.hasNext()) {
                 Object v = iterator.next();
                 if (v instanceof String) {
                     sj.add("'"+v.toString()+"'");
                 }else {
-                    sj.add(wrapp(v));
+                    sj.add(wrappValue(v));
                 }
             }
             res =  sj.toString();

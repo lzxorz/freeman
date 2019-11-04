@@ -46,9 +46,6 @@ public class SysOrg extends AuditableEntity<SysOrg,Long> {
     @Size(max = 20, message = "{noMoreThan}")
     private String name;
 
-    /** 区划编码 */
-   /*private String regionCode;*/
-
     /** 机构类型[1:公司,2:部门] */
     private String type;
 

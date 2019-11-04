@@ -250,7 +250,7 @@ export default {
   },
   mounted () {
     this.welcomeMessage = welcome(`${this.user.username}`)
-    index({}, {userId: `${this.user.userId}`}).then((r) => {
+    index({}, {userId: `${this.user.id}`}).then((r) => {
       let data = r.data.data
       this.todayIp = data.todayIp
       this.todayVisitCount = data.todayVisitCount

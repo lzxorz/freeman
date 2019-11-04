@@ -40,6 +40,7 @@ public class SysDictServiceImpl extends BaseServiceImpl<SysDictRepository, SysDi
     @Override
     public Page<SysDict> findAll(SysDict dict, Pageable pageable) {
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
+                .from("sys_dict")
                 .eq("name", dict.getName());
         return dao.findAllByNativeSql(nativeSqlQuery, SysDict.class, pageable);
     }

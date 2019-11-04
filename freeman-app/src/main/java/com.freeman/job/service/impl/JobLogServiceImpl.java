@@ -35,7 +35,7 @@ public class JobLogServiceImpl extends BaseServiceImpl<JobLogRepository, JobLog,
             .eq( "method_name", jobLog.getMethodName())
             .contains("parameter", jobLog.getParameter())
             .eq( "status", jobLog.getStatus())
-            .between(Objects.nonNull(createTime), "create_time", ((Object[])createTime)[0], ((Object[])createTime)[1])
+            .between( "date_format(create_time,'%Y-%m-%d')", createTime)
             .build();
 
         return dao.findAllByNativeSql(nativeSql, JobLog.class, pageRequest);

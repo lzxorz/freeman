@@ -396,7 +396,7 @@
                 <version>${java-jwt.version}</version>
             </dependency>
             <!-- oauth2.authzserver -->
-            <dependency>
+            <!--<dependency>
                 <groupId>org.apache.oltu.oauth2</groupId>
                 <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
                 <version>${oltu-oauth2.version}</version>
@@ -405,7 +405,7 @@
                 <groupId>org.apache.oltu.oauth2</groupId>
                 <artifactId>org.apache.oltu.oauth2.client</artifactId>
                 <version>${oltu-oauth2.version}</version>
-            </dependency>
+            </dependency>-->
             <!-- quartz -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>

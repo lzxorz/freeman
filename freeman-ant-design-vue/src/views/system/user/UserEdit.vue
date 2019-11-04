@@ -115,7 +115,7 @@ export default {
             this.$emit('success')
             // 如果修改用户就是当前登录用户的话，更新其state
             if (user.username === this.currentUser.username) {
-              $getUser({}, {userId: `${user.userId}`}).then((r) => {
+              $getUser({}, {userId: `${user.id}`}).then((r) => {
                 this.setUser(r.data)
               })
             }

@@ -88,7 +88,7 @@ export default {
     },
     updateAvatar () {
       this.updateAvatarModelVisible = true
-      this.userId = this.user.userId
+      this.userId = this.user.id
     },
     updateProfile () {
       this.$refs.updateProfile.setFormValues(this.user)

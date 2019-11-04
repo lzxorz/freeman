@@ -111,7 +111,7 @@ public class CacheServiceImpl implements ICacheService {
         if (id == null) return null;
         List<SysUser> users = cacheable( (List<Long> ids) -> {
             NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
-                .select(SysUserRepository.userColumn).from(SysUserRepository.userFrom).in("id", ids);
+                .select(SysUserRepository.userColumn).from(SysUserRepository.userFrom).in("su.id", ids);
             List<SysUser> allUser = userRepository.findAllByNativeSql(nativeSqlQuery,SysUser.class);
             return allUser;
         }, SysUser.class, Constants.CACHE.USER_PREFIX, CollectionUtil.newArrayList(id));

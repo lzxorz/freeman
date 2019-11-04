@@ -113,7 +113,7 @@ export default {
         fixHeader: this.fixedHeader ? '1' : '0',
         layout: this.layout,
         color: this.color,
-        userId: this.user.userId
+        userId: this.user.id
       }).then(() => {
         this.$message.success('保存成功')
         this.setSettingBar(false)

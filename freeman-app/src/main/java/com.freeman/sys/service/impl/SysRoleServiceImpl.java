@@ -48,7 +48,7 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleRepository, SysRo
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
                 .from("sys_role sr")
                 .contains("sr.name", sysRole.getName())
-                .between(Objects.nonNull(createTime), "date_format(sr.create_time,'%Y-%m-%d')", ((Object[])createTime)[0], ((Object[])createTime)[1])
+                .between( "date_format(sr.create_time,'%Y-%m-%d')", createTime)
                 .eq("sr.status", DictUtil.getDictValue("sys_status", "有效", "1"))
                 .sqlStrPart((String)sysRole.getParams("dataScope"))
                 .orderBy("sr.sort_no asc");

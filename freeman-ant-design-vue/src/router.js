@@ -32,7 +32,7 @@ router.beforeEach((to, from, next) => {
   if (ls.get('ACCESS_TOKEN') && user) {
     if (!asyncRouter) {
       if (!userRouter) {
-        $getUserRouter({}, {userId: `${user.userId}`}).then((res) => {
+        $getUserRouter({}, {userId: `${user.id}`}).then((res) => {
           asyncRouter = res.data
           ls.set('USER_ROUTER', asyncRouter)
           go(to, next)

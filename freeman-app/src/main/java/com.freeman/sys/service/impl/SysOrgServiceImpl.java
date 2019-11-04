@@ -62,18 +62,18 @@ public class SysOrgServiceImpl extends BaseServiceImpl<SysOrgRepository, SysOrg,
     private List<SysOrg> findAllByNativeSql(SysOrg org, Sort sort) {
 
         Object createTime = org.getParams("createTime"); //传进来是数组
-        String orderBy = StrUtil.camelStr2UnderlineStr(sort.toString().replace(":", " "));
+        String orderBy = sort != null ? StrUtil.camelStr2UnderlineStr(sort.toString().replace(":", " ")) : null;
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
                 .from("sys_org so")
                 .eq("so.id", org.getId())
                 .contains("so.name", org.getName())
-                .between(Objects.nonNull(createTime), "date_format(so.create_time,'%Y-%m-%d')", ((Object[]) createTime)[0], ((Object[]) createTime)[1])
+                .between( "date_format(so.create_time,'%Y-%m-%d')", createTime)
                 .sqlStrPart((String)org.getParams("dataScope"))
-                .orderBy("so." + orderBy)
+                .orderBy(orderBy!=null ? ("so." + orderBy) : "")
                 .build();
 
-        return dao.findAllByNativeSql(nativeSql, SysLog.class);
+        return dao.findAllByNativeSql(nativeSql, SysOrg.class);
     }
 
 

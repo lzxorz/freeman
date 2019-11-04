@@ -65,7 +65,7 @@ public class JobServiceImpl extends BaseServiceImpl<JobRepository, Job,Long> imp
                 .contains("parameter", job.getParameter())
                 .contains("remark", job.getRemark())
                 .eq( "status", job.getStatus())
-                .between(Objects.nonNull(createTime), "create_time", ((Object[])createTime)[0], ((Object[])createTime)[1]);
+                .between( "date_format(create_time,'%Y-%m-%d')", createTime);
 
         return dao.findAllByNativeSql(nativeSql, Job.class, pageRequest);
     }

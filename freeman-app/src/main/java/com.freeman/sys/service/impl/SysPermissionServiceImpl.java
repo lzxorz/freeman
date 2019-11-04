@@ -57,7 +57,7 @@ public class SysPermissionServiceImpl extends BaseServiceImpl<SysPermissionRepos
                 .from(dao.permissionFrom)
                 .contains("sp.name", permission.getName())
                 .eq("sp.type", permission.getType())
-                .between(Objects.nonNull(createTime), "date_format(sp.create_time,'%Y-%m-%d')", ((Object[])createTime)[0], ((Object[])createTime)[1])
+                .between( "date_format(so.create_time,'%Y-%m-%d')", createTime)
                 .orderBy("sort_no asc");
         List treeList = dao.findAllByNativeSql(nativeSqlQuery, Tree.class);
         return TreeUtil.build(treeList);
