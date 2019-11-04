@@ -261,7 +261,7 @@ public class CacheServiceImpl implements ICacheService {
     public void loadCaches() {
         cachePut((List<Long> ids) -> {
             NativeSqlQuery nativeSql = NativeSqlQuery.builder()
-                .select(SysUserRepository.userColumn).from(SysUserRepository.userFrom).build();
+                .select(SysUserRepository.userColumn).from(SysUserRepository.userFrom).groupBy("su.id").build();
             List<SysUser> sysUsers = userRepository.findAllByNativeSql(nativeSql, SysUser.class);
             return sysUsers;
         }, Constants.CACHE.USER_PREFIX, null);

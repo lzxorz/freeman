@@ -3,7 +3,7 @@ package com.freeman.sys.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import com.freeman.common.base.controller.BaseController;
-import com.freeman.common.dataPermission.DataPermissionUtil;
+import com.freeman.common.dataPermission.DataPermUtil;
 import com.freeman.common.log.Log;
 import com.freeman.common.result.R;
 import com.freeman.common.utils.StrUtil;
@@ -34,7 +34,7 @@ public class SysRoleController extends BaseController {
     /** 列表数据 */
     @GetMapping @RequiresPermissions("role:view")
     public R retrieveRole(SysRole role, QueryRequest queryRequest) {
-        List<SysRole> all = roleService.findByNativeSql(DataPermissionUtil.dataScopeFilter(role), queryRequest.getSort());
+        List<SysRole> all = roleService.findByNativeSql(DataPermUtil.dataScopeFilter(role), queryRequest.getSort());
         return R.ok("获取成功", all);
     }
 

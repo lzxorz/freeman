@@ -1,7 +1,6 @@
 package com.freeman;
 
 import cn.hutool.core.util.StrUtil;
-import com.freeman.spring.data.utils.StringKit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -34,7 +33,7 @@ public class regexTest {
         orderByClause.setLength(0);
         while (m.find()) {
             String part = m.group();
-            m.appendReplacement(orderByClause, StringKit.camelToUnderline(part));
+            m.appendReplacement(orderByClause, StrUtil.toUnderlineCase(part));
         }
         m.appendTail(orderByClause);
 

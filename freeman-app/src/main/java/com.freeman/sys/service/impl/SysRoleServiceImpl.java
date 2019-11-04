@@ -44,13 +44,13 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleRepository, SysRo
 
     @Override @SuppressWarnings("Duplicates")
     public List<SysRole> findByNativeSql(SysRole sysRole, Sort sort) {
-        String name = sysRole.getName();
         Object createTime = sysRole.getParams("createTime"); //传进来是数组
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
-                .like(StrUtil.isNotBlank(name), "sr.name", "%"+name+"%")
+                .from("sys_role sr")
+                .contains("sr.name", sysRole.getName())
                 .between(Objects.nonNull(createTime), "date_format(sr.create_time,'%Y-%m-%d')", ((Object[])createTime)[0], ((Object[])createTime)[1])
                 .eq("sr.status", DictUtil.getDictValue("sys_status", "有效", "1"))
-                .conditionStrPart((String)sysRole.getParams("dataScope"))
+                .sqlStrPart((String)sysRole.getParams("dataScope"))
                 .orderBy("sr.sort_no asc");
         List<SysRole> reslutList = dao.findAllByNativeSql(nativeSqlQuery, SysRole.class);
         return reslutList;

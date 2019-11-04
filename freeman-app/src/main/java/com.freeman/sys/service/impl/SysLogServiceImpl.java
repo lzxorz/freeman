@@ -39,14 +39,12 @@ public class SysLogServiceImpl extends BaseServiceImpl<SysLogRepository, SysLog,
     public Page<SysLog> findPage(QueryRequest queryRequest, SysLog sysLog) {
 
         PageRequest pageRequest = queryRequest.getPageRequest();
-        String operation = sysLog.getOperation();
-        String location = sysLog.getLocation();
         Object createTime = sysLog.getParams("createTime"); //传进来是数组
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
             .eq("username", sysLog.getUsername())
-            .like(StrUtil.isNotBlank(operation), "operation", operation)
-            .like(StrUtil.isNotBlank(location), "location", location)
+            .contains("operation", sysLog.getOperation())
+            .contains("location", sysLog.getLocation())
             .between(Objects.nonNull(createTime), "create_time", ((Object[]) createTime)[0], ((Object[]) createTime)[1])
             .build();
 

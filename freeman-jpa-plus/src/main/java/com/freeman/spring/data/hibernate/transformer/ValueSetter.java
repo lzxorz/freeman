@@ -58,19 +58,6 @@ public class ValueSetter {
             return;
         }
 
-       // if (field.isCollection()) {
-       //     CollectionFields collectionFields = (CollectionFields) field;
-       //     Object genericValue = getGenericObject(propertyValue, collectionFields);
-       //
-       //     if (genericValue instanceof Map) {
-       //         ((Map) genericValue).put(remainAlias, value);
-       //         return;
-       //     }
-       //
-       //     set(genericValue, remainAlias, value, field.getChildrenFields());
-       //     return;
-       // }
-
         set(propertyValue, remainAlias, value, field.getChildrenFields());
     }
 

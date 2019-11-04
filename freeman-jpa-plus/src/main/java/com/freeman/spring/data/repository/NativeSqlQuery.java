@@ -5,7 +5,6 @@ import com.freeman.common.utils.StrUtil;
 
 import java.util.*;
 
-import static com.freeman.spring.data.repository.Operator.AND;
 
 
 /**
@@ -15,20 +14,22 @@ import static com.freeman.spring.data.repository.Operator.AND;
 
 public class NativeSqlQuery {
 
-    private String selectSegment="*"; // 查询的列
+    private String selectSegment="*";   // 查询的列
     private String fromSegment;         // 表别名 要与 select 中的对应
     private StringJoiner whereSegment;  // where 条件拼接
-    private String conditionStrPart=""; // 追加到 where 条件尾部的自定义sql字符串片段
+    private String sqlStrPart ="";      // 追加到 where 条件尾部的自定义sql字符串片段
     private String groupBySegment;      //
     private String havingSegment;       //
     private String orderBySegment;      // nativeSqlQuery.orderBy("字段 asc,字段 desc"). 注意: 使用这个条件查询构造器时,pageable对象中的排序无效。
 
-
+    public static enum Operator {
+        EQ,NE,LT,LTE,GT,GTE,ISNULL,ISNOTNULL,ISEMPTY,ISNOTEMPTY,LIKE,NOTLIKE,IN,NOTIN,BETWEEN,NOTBETWEEN,AND,OR;
+    }
 
     /**
      * 默认用 and 连接 查询条件
      */
-    public NativeSqlQuery() { this(AND); }
+    public NativeSqlQuery() { this(Operator.AND); }
 
     /**
      * 指定查询条件之间是用 and 还是 or 连接
@@ -42,7 +43,7 @@ public class NativeSqlQuery {
      * 快捷构建方法
      */
     public static NativeSqlQuery builder() {
-        return new NativeSqlQuery(AND);
+        return new NativeSqlQuery(Operator.AND);
     }
 
     /** select 要查询的列 */
@@ -110,16 +111,51 @@ public class NativeSqlQuery {
         return this;
     }
 
-    public NativeSqlQuery like(boolean condition, String columnName, Object value){
+    /*public NativeSqlQuery like(boolean condition, String columnName, Object value){
         if (condition && Objects.nonNull(value)) {
             whereSegment.add(columnName + " LIKE " + wrapp(value));
         }
         return this;
+    }*/
+    public NativeSqlQuery startsWith(String columnName, Object value){
+        if (Objects.nonNull(value)) {
+            whereSegment.add(columnName + " LIKE " + wrapp(value) + "%");
+        }
+        return this;
     }
-
-    public NativeSqlQuery notLike(boolean condition, String columnName, Object value) {
+    public NativeSqlQuery contains(String columnName, Object value){
+        if (Objects.nonNull(value)) {
+            whereSegment.add(columnName + " LIKE %" + wrapp(value) + "%");
+        }
+        return this;
+    }
+    public NativeSqlQuery endsWith(String columnName, Object value){
+        if (Objects.nonNull(value)) {
+            whereSegment.add(columnName + " LIKE %" + wrapp(value));
+        }
+        return this;
+    }
+    /*public NativeSqlQuery notLike(boolean condition, String columnName, Object value) {
         if (condition && Objects.nonNull(value)) {
             whereSegment.add(columnName + " NOT LIKE " + wrapp(value));
+        }
+        return this;
+    }*/
+    public NativeSqlQuery notStartsWith(String columnName, Object value){
+        if (Objects.nonNull(value)) {
+            whereSegment.add(columnName + " NOT LIKE " + wrapp(value) + "%");
+        }
+        return this;
+    }
+    public NativeSqlQuery notContains(String columnName, Object value){
+        if (Objects.nonNull(value)) {
+            whereSegment.add(columnName + " NOT LIKE %" + wrapp(value) + "%");
+        }
+        return this;
+    }
+    public NativeSqlQuery notEndsWith(String columnName, Object value){
+        if (Objects.nonNull(value)) {
+            whereSegment.add(columnName + " NOT LIKE %" + wrapp(value));
         }
         return this;
     }
@@ -167,8 +203,8 @@ public class NativeSqlQuery {
     }
 
     /** 追加到 where条件尾部的自定义sql字符串片段 */
-    public NativeSqlQuery conditionStrPart(String part){
-        this.conditionStrPart = part;
+    public NativeSqlQuery sqlStrPart(String part){
+        this.sqlStrPart = part;
         return this;
     }
     /** where 条件 end */
@@ -203,11 +239,11 @@ public class NativeSqlQuery {
         }
         if (whereSegment.length()>0) {
             sj.add("WHERE " + whereSegment.toString());
-            if (conditionStrPart.length()>0) {
-                sj.add(conditionStrPart);
+            if (sqlStrPart.length()>0) {
+                sj.add(sqlStrPart);
             }
-        }else if (conditionStrPart.length()>0) {
-            sj.add("WHERE " + conditionStrPart);
+        }else if (sqlStrPart.length()>0) {
+            sj.add("WHERE " + sqlStrPart);
         }
         if (StrUtil.isNotBlank(groupBySegment)) {
             sj.add("GROUP BY " + groupBySegment);

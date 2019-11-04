@@ -51,12 +51,11 @@ public class SysPermissionServiceImpl extends BaseServiceImpl<SysPermissionRepos
 
     @Override
     public Tree findTree(SysPermission permission) {
-        String name = permission.getName();
         Object createTime = permission.getParams("createTime"); //传进来是数组
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
                 .select(dao.treeColumn)
                 .from(dao.permissionFrom)
-                .like(StrUtil.isNotBlank(name), "sp.name", "%"+name+"%")
+                .contains("sp.name", permission.getName())
                 .eq("sp.type", permission.getType())
                 .between(Objects.nonNull(createTime), "date_format(sp.create_time,'%Y-%m-%d')", ((Object[])createTime)[0], ((Object[])createTime)[1])
                 .orderBy("sort_no asc");

@@ -3,7 +3,7 @@ package com.freeman.sys.controller;
 import cn.hutool.core.convert.Convert;
 import com.freeman.common.auth.shiro.utils.ShiroUtil;
 import com.freeman.common.base.controller.BaseController;
-import com.freeman.common.dataPermission.DataPermissionUtil;
+import com.freeman.common.dataPermission.DataPermUtil;
 import com.freeman.common.log.Log;
 import com.freeman.common.result.R;
 import com.freeman.common.utils.StrUtil;
@@ -43,7 +43,7 @@ public class SysUserController extends BaseController {
     @GetMapping
     @RequiresPermissions("user:view")
     public R userList(SysUser user, QueryRequest queryRequest) {
-        Page<SysUser> page = userService.findAll(DataPermissionUtil.dataScopeFilter(user), queryRequest.getPageRequest());
+        Page<SysUser> page = userService.findAll(DataPermUtil.dataScopeFilter(user), queryRequest.getPageRequest());
         return R.ok("获取成功", page);
     }
 

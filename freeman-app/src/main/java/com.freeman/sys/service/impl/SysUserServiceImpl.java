@@ -50,20 +50,18 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserRepository, SysUs
     @Override @DbSource
     public Page<SysUser> findAll(SysUser user, Pageable pageable) {
 
-        String username = user.getUsername();
-        String realname = user.getRealname();
         Object createTime = user.getParams("createTime"); //传进来是数组
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
             .select(dao.userColumn)
             .from(dao.userFrom)
-            .like(StrUtil.isNotBlank(username), "su.username", "%" + username + "%")
-            .like(StrUtil.isNotBlank(realname), "su.realname", "%" + realname + "%")
+            .contains( "su.username", user.getUsername())
+            .contains( "su.realname", user.getRealname())
             .eq("su.sex", user.getSex())
             .eq("su.dept_id", user.getDeptId())
             .eq("su.status", user.getStatus())
             .between(Objects.nonNull(createTime), "date_format(su.create_time,'%Y-%m-%d')", ((Object[]) createTime)[0], ((Object[]) createTime)[1])
-            .conditionStrPart((String)user.getParams("dataScope"))
+            .sqlStrPart((String)user.getParams("dataScope"))
             .build();
 
         return dao.findAllByNativeSql(nativeSql, SysUser.class, pageable);

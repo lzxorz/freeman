@@ -23,7 +23,8 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * SimpleJpaRepository 修改
+ * dao
+ * @author 刘志新
  */
 @Transactional(readOnly = true)
 public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements BaseRepository<T, ID> {

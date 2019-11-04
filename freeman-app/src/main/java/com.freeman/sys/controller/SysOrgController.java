@@ -3,7 +3,7 @@ package com.freeman.sys.controller;
 
 import cn.hutool.core.convert.Convert;
 import com.freeman.common.log.Log;
-import com.freeman.common.dataPermission.DataPermissionUtil;
+import com.freeman.common.dataPermission.DataPermUtil;
 import com.freeman.spring.data.utils.request.QueryRequest;
 import com.freeman.common.result.R;
 import com.freeman.common.base.controller.BaseController;
@@ -56,7 +56,7 @@ public class SysOrgController extends BaseController {
      **/
     @GetMapping
     public R orgList(SysOrg org, QueryRequest queryRequest) {
-        Tree orgTree = orgService.findOrgTableTree(DataPermissionUtil.dataScopeFilter(org), queryRequest.getSort());
+        Tree orgTree = orgService.findOrgTableTree(DataPermUtil.dataScopeFilter(org), queryRequest.getSort());
         return R.ok("获取成功", orgTree);
     }
 
@@ -71,7 +71,7 @@ public class SysOrgController extends BaseController {
      **/
     @GetMapping("/treeSelect")
     public R orgSelectTree(Boolean lazy, Long pid) {
-        Tree orgTree = orgService.findOrgSelectTree(DataPermissionUtil.dataScopeFilter(new SysOrg()));
+        Tree orgTree = orgService.findOrgSelectTree(DataPermUtil.dataScopeFilter(new SysOrg()));
         return R.ok("获取成功", orgTree);
     }
 

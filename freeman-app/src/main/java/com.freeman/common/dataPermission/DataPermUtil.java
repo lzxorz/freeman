@@ -1,24 +1,21 @@
 package com.freeman.common.dataPermission;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.freeman.common.auth.shiro.utils.ShiroUtil;
 import com.freeman.common.constants.Constants;
-import com.freeman.common.utils.DateUtil;
 import com.freeman.common.utils.StrUtil;
+import com.freeman.spring.data.annotation.TableAlias;
+import com.freeman.spring.data.domain.BaseEntity;
 import com.freeman.sys.domain.SysOrg;
 import com.freeman.sys.domain.SysUser;
-import com.freeman.spring.data.annotation.TableAlias;
-import com.freeman.common.auth.shiro.utils.ShiroUtil;
-import com.freeman.spring.data.domain.BaseEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
 
-import javax.persistence.Column;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringJoiner;
 
 @Slf4j
-public class DataPermissionUtil {
+public class DataPermUtil {
     //0:全部数据权限,1:自定义数据权限,2:本公司及以下数据,3:本公司数据,4:本部门数据及以下数据,5:本部门数据 ,6:仅本人数据,7:无
 
 
@@ -57,6 +54,7 @@ public class DataPermissionUtil {
         for (String scope : currentUser.getDataScope()) {
             switch (scope){
                 case Constants.DATA_SCOPE.ALL: // 0:全部数据权限
+                    segments.clear();
                     return entity;
                 case Constants.DATA_SCOPE.CUSTOM: // 1:自定义数据权限
                     if (entity instanceof SysOrg){

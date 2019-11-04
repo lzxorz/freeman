@@ -20,6 +20,9 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface BaseRepository<T, ID extends Serializable> extends PagingAndSortingRepository<T, ID>/*, JpaSpecificationExecutor<T>*/ {
 
+    Class<T> getEntityClass();
+    String getEntityName();
+
     //======= Crud begin ====== //
     <S extends T> S save(S s);
     <S extends T> List<S> saveAll(Iterable<S> iter);
@@ -58,8 +61,5 @@ public interface BaseRepository<T, ID extends Serializable> extends PagingAndSor
     long countByQL(final String ql, final Object... params);
 
     // ================================ //
-
-    Class<T> getEntityClass();
-    String getEntityName();
 
 }

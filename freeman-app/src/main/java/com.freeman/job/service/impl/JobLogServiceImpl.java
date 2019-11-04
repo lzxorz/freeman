@@ -27,13 +27,13 @@ public class JobLogServiceImpl extends BaseServiceImpl<JobLogRepository, JobLog,
 
         PageRequest pageRequest = queryRequest.getPageRequest();
 
-        String parameter = jobLog.getParameter();
         Object createTime = jobLog.getParams("create_time"); //传进来是数组
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
+            .from("t_job_log")
             .eq( "bean_name", jobLog.getBeanName())
             .eq( "method_name", jobLog.getMethodName())
-            .like(StrUtil.isNotBlank(parameter),"parameter", parameter)
+            .contains("parameter", jobLog.getParameter())
             .eq( "status", jobLog.getStatus())
             .between(Objects.nonNull(createTime), "create_time", ((Object[])createTime)[0], ((Object[])createTime)[1])
             .build();

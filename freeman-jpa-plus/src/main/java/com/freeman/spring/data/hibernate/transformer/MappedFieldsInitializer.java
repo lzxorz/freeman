@@ -10,9 +10,6 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class MappedFieldsInitializer {
-//  private boolean collection = false;
-//  private List<String> collectionFieldNames = new ArrayList<>();
-
 
     public Map<String, Fields> init(Class mappedClass) {
         Map<String, Fields> fields = new HashMap<>();
@@ -35,45 +32,12 @@ public class MappedFieldsInitializer {
                 continue;
             }
 
-            Fields childField = null;
-            // if (isCollection(propertyType)) {
-            //    this.collection = true;
-            //    propertyType = getGenericType(mappedClass, name);
-            //    childField = new CollectionFields(pd, propertyType);
-            //    collectionFieldNames.add(name);
-            // }
-
-            // if (childField == null) {
-               childField = new Fields(pd);
-            // }
+            Fields childField = new Fields(pd);
 
             childField.setChildrenFields(init(propertyType));
             fields.put(name, childField);
         }
         return fields;
-    }
-
-    private static Class getGenericType(Class mappedClass, String filedName) {
-        try {
-            Type type = ((ParameterizedType) mappedClass.getDeclaredField(filedName).getGenericType()).getActualTypeArguments()[0];
-            if (type.getTypeName().contains("java.util.Map")) {
-                return Map.class;
-            }
-            return (Class) type;
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-
-
-   // public List<String> getCollectionFieldNames() {
-   //     return collectionFieldNames;
-   // }
-
-    private static boolean isCollection(Class<?> propertyType) {
-        return Collection.class.isAssignableFrom(propertyType);
     }
 
     private static boolean isMap(Class<?> propertyType) {

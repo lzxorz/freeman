@@ -56,15 +56,14 @@ public class JobServiceImpl extends BaseServiceImpl<JobRepository, Job,Long> imp
 
         PageRequest pageRequest = queryRequest.getPageRequest();
 
-        String parameter = job.getParameter();
-         String remark = job.getRemark();
         Object createTime = job.getParams("createTime"); //传进来是数组
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
+                .select("t_job")
                 .eq( "bean_name", job.getBeanName())
                 .eq( "method_name", job.getMethodName())
-                .like( StrUtil.isNotBlank(parameter),"parameter", "%"+parameter+"%")
-                .like( StrUtil.isNotBlank(parameter),"remark", "%"+remark+"%")
+                .contains("parameter", job.getParameter())
+                .contains("remark", job.getRemark())
                 .eq( "status", job.getStatus())
                 .between(Objects.nonNull(createTime), "create_time", ((Object[])createTime)[0], ((Object[])createTime)[1]);
 

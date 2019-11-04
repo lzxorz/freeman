@@ -46,7 +46,7 @@ public class CollectionFields extends Fields {
         if (this.genericClass.isAssignableFrom(Map.class)) {
             return new HashMap<>();
         }
-        return BeanUtils.instantiate(this.genericClass);
+        return BeanUtils.instantiateClass(this.genericClass);
     }
 
 }
