@@ -1,4 +1,4 @@
-package com.freeman.common.dataPermission;
+package com.freeman.common.dataPerm;
 
 import com.freeman.common.auth.shiro.utils.ShiroUtil;
 import com.freeman.common.constants.Constants;

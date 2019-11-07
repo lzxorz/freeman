@@ -110,9 +110,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 
     @Override
     public List<T> findAllById(Iterable<ID> ids) {
-        //return super.getQuery((Specification)null, this.entityClass, (Sort)Sort.unsorted()).getResultList();
         if (ObjectUtils.isEmpty(ids)) return null;
-
         return super.findAllById(ids);
     }
 
@@ -172,26 +170,6 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
         return new PageImpl<>(result,pageable,totalRecord);
     }
 
-    /** 执行 insert */
-    public int insertByQL(final String ql, final Object... params) {
-        Query query = em.createQuery(ql);
-        setParameters(query, params);
-        return query.executeUpdate();
-    }
-
-    /** 执行 update */
-    public int updateByQL(final String ql, final Object... params) {
-        Query query = em.createQuery(ql);
-        setParameters(query, params);
-        return query.executeUpdate();
-    }
-    
-    /** 执行 delete */
-    public int deleteByQL(final String ql, final Object... params) {
-        Query query = em.createQuery(ql);
-        setParameters(query, params);
-        return query.executeUpdate();
-    }
     
     /************************************************************************************/
 

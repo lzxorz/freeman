@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@MappedSuperclass //类将不是一个完整的实体类，他将不会映射到数据库表，但是他的属性都将映射到其子类的数据库字段中。 //http://blog.sina.com.cn/s/blog_7085382f0100uk4p.htmlS
+@MappedSuperclass //类将不是一个完整的实体类，他将不会映射到数据库表，但是他的属性都将映射到其子类的数据库字段中。
 @EntityListeners({BaseEntityListener.class})//用于监听实体类操作的。
 public abstract class BaseEntity<T extends Model, ID extends Serializable> extends Model<T,ID> {
 
@@ -31,7 +31,7 @@ public abstract class BaseEntity<T extends Model, ID extends Serializable> exten
 
     /**
      * 请求参数
-     * 例如: createTime=["2049-01-01","2049-12-12"]
+     * 例如: params["createTime"]=["2049-01-01","2049-12-12"]
      */
     @Transient @JSONField(serialize = false)
     private Map<String, Object> params;

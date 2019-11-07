@@ -8,7 +8,7 @@ import com.freeman.common.constants.Constants;
 import com.freeman.common.router.RouterMeta;
 import com.freeman.common.router.VueRouter;
 import com.freeman.common.utils.StrUtil;
-import com.freeman.common.utils.TreeUtil;
+import com.freeman.common.base.domain.TreeUtil;
 import com.freeman.spring.data.repository.NativeSqlQuery;
 import com.freeman.sys.domain.SysPermission;
 import com.freeman.sys.repository.SysPermissionRepository;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j

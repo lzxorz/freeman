@@ -1,4 +1,4 @@
-package com.freeman.common.utils;
+package com.freeman.common.base.domain;
 
 
 

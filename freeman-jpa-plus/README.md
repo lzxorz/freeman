@@ -1,44 +1,40 @@
-### freeman-jpa-plus
+### jpa-plus
 
-基于优秀的开源项目 `spring-data-jpa-extra` 大刀阔斧修改版。
-关于`spring-data-jpa-extra`项目以及作者更多信息 可以查看`pom`文件 或 [点击这里](https://github.com/slyak/spring-data-jpa-extra)。
+关于jpa功能增强的开源项目，在github上可以找到几个，比如：[spring-data-jpa-extra](https://github.com/slyak/spring-data-jpa-extra)、[jpa-spec](https://github.com/wenhao/jpa-spec)、[spring-data-jpa-expansion](https://github.com/fast-family/spring-data-jpa-expansion)。
 
+我原本拿`spring-data-jpa-extra`魔改了一番，但是后来觉得封装过于复杂，不够简单高效，弃用了。 
 
-### freeman-jpa-plus 简介
+然后想按照`myBatis-plus`的`QueryWrapper`和`UpdateWrapper`自己封装出来jpa版本，封装`QueryWrapper`很容易想到可以使用jpa的`Specification`实现。但是，想实现`UpdateWrapper`的效果就有点儿...。封装`QueryWrapper`块的时候遇到点儿问题，在查百度时看到了`jpa-spec`这个项目。此时，我也差不多封装完了、绝不放弃。顺利写完我的版本(更接近`myBatis-plus`的`QueryWrapper`的写法)。后来觉得联查功能不够强大，并且必须在实体类中加响应的注解(orm...我不喜欢)，总之还是不够简单高效，又弃用了。
 
-完全面向对象的ORM框架的特点: `把简单的事情变得更简单; 把复杂的事情变得更复杂,复杂查询面向对象写法、SQL逻辑不直观`。
-把简单的事情变得更简单,大家都能欣然接受; 但是,把复杂的事情变得更复杂, 实在有点儿忍受不了, 简直是为了`面向对象`而`面向对象`; 理论上再优秀, 降低了开发效率, 自然也是 备受诟病;
-我们是谁？ `程序员`; 遇到不好用的轮子怎么办? `改轮子`! 取其精华去其糟粕,把Mybatis的优点再尽力融合进来, 让大家愉快的使用`jpa`, 是`freeman`框架的小目标之一;
+经过查资料多次尝试，发现NativeSql查询很好很强大，实现ResultTransformer可以定制查询结果转化到任意pojo，应该可以封装出我想要的`简单高效`的效果，于是又一次的努力，有了`jpa-plus`。目前，只封装了查询功能。更新功能还没封装。
 
 
-### freeman-jpa-plus 功能说明
-
-由于spring-data-jpa的`Example`实在太鸡肋,所以屏蔽掉了; 请放心,自然是有更好更强大的 操作方式 取而代之; jpa其他的写法,依旧循规踏距地使用就可以;
-参考`Mybatis Plus` 基于jpa的`Specification`实现了 查询条件构造器 `QueryWrapper`; 实现方式与开源项目[jpa-spec](https://github.com/wenhao/jpa-spec)雷同,因为想实现`Mybatis Plus QueryWrapper`那样的效果,最简单最容易想到的方式就是使用`Specification`;
-与之不同的是,本框架的`QueryWrapper` 更接近`Mybatis Plus` `QueryWrapper`的写法; `Mybatis Plus`的`UpdateWrapper`也很好用,但是jpa封装出类似的效果,需要写的代码量有点而大,暂时不作实现;
-受`Mybatis`的启发, 基于现有开源项目[spring-data-jpa-extra](https://github.com/slyak/spring-data-jpa-extra)实现了使用sql模板文件 写sql片段的方式 直观地动态地 原生sql操作增删改查;
-
-
-### freeman-jpa-plus 使用说明
+### 小知识
 
 **实体类**
 
 实体类 顶层父类是`Model`提供了ActiveRecord的模式,支持 ActiveRecord 形式调用,实体类只需继承 Model 类即可实现基本 CRUD 操作;
 实体类的 直接父类 可以是`BaseEntity`或`BaseEntity`的子类`AuditableEntity`;
 
-`BaseEntity` 中定义了用于逻辑删除的属性`delFlag`,所以**新建表**的时候记得添加字段**del_flag**; 还有个Map结构的瞬态属性`params`,用于前端传参在实体类没有对应属性 但是还想在不添加属性的情况下用实体类接收参数时使用[^1]
+`BaseEntity`中有一个`Map<String, Object> params`，前端传数据字段多于实体类属性、不想在实体类加相应的属性时(请看下面例子)。
+
+```java
+// 实体类属性: createTime 创建时间
+// 需要范围查询
+// 添加响应属性方式： createTimeBegin、createTimeEnd ==> 调用接口传入 createTimeBegin="2049-01-01",createTimeBegin="2049-12-12"
+// 放入Map方式：  调用接口传入 params['createTime']=["2049-01-01","2049-12-12"]
+// 使用方式：     实体类对象.getParams("createTime"); //创建起止时间的数组
+```
 
 
 `AuditableEntity` 中定义了后台管理常用到的审计字段 `createTime``createBy` `updateTime` `updateBy`, 需要这些字段的实体类应该继承`AuditableEntity`,对应的表中也要有字段 `create_time``create_by` `update_time` `update_by`;
-写代码时 不用关心这四个字段有没有值,框架会自动赋值;
+**写代码**时，**不用关心**这四个字段有没有值,框架会自动赋值;
 
-实体类的 类名称和属性 与 数据库表名称和字段名称 是`驼峰转下划线连接的小写形式`的关系[^2];
+实体类的 类名称和属性 与 数据库表名称和字段名称 是`驼峰转下划线连接的小写形式`的关系;
 如果表名称有实体类不具备的前缀(比如,表名称`t_job_log`,实体类名称`JobLog`),需要在实体类注解@Entity中明确赋值name(`@Entity(name = "t_job_log")`);
 
+实体类上的 表别名注解 `@TableAlias("表别名")`, **每个实体类都应该加上此注解**, 注解的value值应该与NativeSqlQuery中的表别名一致。`数据范围过滤`动态生成的sql片段会插入到sql模板中;
 
-实体类上的 表别名注解 `@TableAlias("su")`, **每个实体类都应该加上此注解**, 注解的value值应该与sql模板文件中的表别名一致, `数据范围过滤`动态生成的sql片段会插入到sql模板中;
-
-实体类上的注解 `@Where(clause = "del_flag=0")`, 非原生sql[^3]查询时,jpa会动态地追加此注解中值到查询语句的Where条件;
 
 例子: 
 ```java
@@ -83,175 +79,74 @@ public class SysOrgServiceImpl extends BaseServiceImpl<SysOrgRepository, SysOrg,
 }
 ```
 
-**Controller**
-
-Controller 可以继承 BaseController(其实啥都没有)
-
-例子:
-
-```java
-public class SysOrgController extends BaseController {}
-```
-
 ---
 
-**查询条件构造器 QueryWrapper**
+### jpa-plus使用说明
 
-构造方法:
-
+sevice层的方法中
 ```java
-// 空参构造, 用 and 连接 eq/like/in等 查询条件
-QueryWrapper<T> queryWrapper = new QueryWrapper<>();
+NativeSqlQuery nativeSql = NativeSqlQuery.builder()
+    .select(查询的列) //必有
+    .from(表名 AS 表别名 LEFT JOIN 表名 AS 表别名 ON XXX = YYY) //必有
+    // where 条件， eq/ne/lt/...可以出现0～n次，生成SQL时 默认用 AND 连接多个where条件
+    // 自动判断属性不为null，才会生成对应sql片段
+    .eq(表别名.列名, java属性值/常量值)
+    .ne(表别名.列名, java属性值/常量值)
+    .lt(表别名.列名, java属性值/常量值)
+    .lte(表别名.列名, java属性值/常量值)
+    .gt(表别名.列名, java属性值/常量值)
+    .gte(表别名.列名, java属性值/常量值)
+    .isNull(表别名.列名) // 不需要传值
+    .isNotNull(表别名.列名) // 不需要传值
+    .startsWith(表别名.列名, java属性值/常量值)
+    .contains(表别名.列名, java属性值/常量值)
+    .endsWith(表别名.列名, java属性值/常量值)
+    .notStartsWith(表别名.列名, java属性值/常量值)
+    .notContains(表别名.列名, java属性值/常量值)
+    .notEndsWith(表别名.列名, java属性值/常量值)
+    .in(表别名.列名, java属性值/常量值)         // 传入Array或List
+    .notIn(表别名.列名, java属性值/常量值)      // 传入Array或List
+    .between(表别名.列名, java属性值/常量值)    // 传入Array或List, 长度应该是2
+    .notBetween(表别名.列名, java属性值/常量值) // 传入Array或List, 长度应该是2
+    .sqlStrPart(自定义sql字符串片段) //追加到where条件尾部(数据权限sql片段)
+    // 以下这些 也是可有可无，跟原生sql写法别无二致
+    .groupBy(表别名.列名)
+    .having(表别名.列名 操作符 值 [AND/OR] [表别名.列名 操作符 值])
+    .orderBy(表别名.列名 ASC[,表别名.列名 DESC])
+    // build可以不写, 照顾用习惯lombok的人(不build一下,可能浑身不自在)
+    .build();
 
-// 有参构造, 传入Operator.OR 或 Operator.AND 指定用 and 还是 or 连接 eq/like/in等 查询条件
-QueryWrapper<T> queryWrapper = new QueryWrapper<>(Operator.OR);
-
+    // nativeSql
+    // pojo.class  普通的java类即可，列名(下划线连接==自动转换==>驼峰命名，去匹配java类的属性)
+    // pageRequest 需要分页,可传入. pageRequest对象中有排序的Sort数据会无视(请用orderBy()排序)
+    // 返回List<pojo>或Page<pojo>
+    dao.findAllByNativeSql(nativeSql, JobLog.class, pageRequest);
 ```
 
-支持的条件查询操作:
+### jpa-plus用法示例
 
-- Equal/NotEqual
-- GreatThan/LessThan
-- GreatThanEqual/LessThanEqual
-- IsNull/IsNotNull
-- In/NotIn
-- Like/NotLike
-- Between/NotBetween
-- 嵌套AND()
-- 嵌套OR
-- 嵌套Specification
-
-条件查询支持三个参数:
-
-- condition: 该条件是否加入最后生成的sql中(可以判断属性是否有值,有值加入查询), 重载方法不传此参数,默认为true
-- propertyName: 实体类的属性名称
-- values: 属性对应的值 (in、notin,可以传多个值; between,notbetween,应该传两个值)
+sevice层的方法中
+```java
  
-在Service实现类的方法中,可以调用如下使用`Specification<T>`的dao方法,可以传入子类`QueryWrapper`
+    Object createTime = jobLog.getParams("createTime"); //传进来是创建起止时间的数组
 
-```
-Optional<T> findOne(@Nullable Specification<T> spec);
-List<T>     findAll(@Nullable Specification<T> spec);
-Page<T>     findAll(@Nullable Specification<T> spec, Pageable pageable);
-List<T>     findAll(@Nullable Specification<T> spec, Sort sort);
-long        count  (@Nullable Specification<T> spec);
-```
+    NativeSqlQuery nativeSql = NativeSqlQuery.builder()
+        .select("tjl.*")
+        .from("t_job_log tjl")
+        .eq("tjl.bean_name", jobLog.getBeanName())
+        .eq("tjl.method_name", jobLog.getMethodName())
+        .contains("tjl.parameter", jobLog.getParameter())
+        .eq("tjl.status", jobLog.getStatus())
+        .between("date_format(tjl.create_time,'%Y-%m-%d')", createTime)
+        .orderBy("tjl.id")
+        .build();
 
-Service代码片段示例:
-
-```java
+    return dao.findAllByNativeSql(nativeSql, JobLog.class, pageRequest);
     
-    @Override
-    public Page<SysUser> findPage(QueryRequest queryRequest, SysUser user) {
-
-        // 空参构造, wrapper链式调用的条件(eq/ne/lt/gt/lte/gte/like...)之间 用 and 连接
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper();
-        
-        String username = user.getUsername();
-        String nickname = user.getNickname();
-        
-        Map<String, Object> params = user.getParams();
-        Object createTime = null; //传进来是数组
-        if (!ObjectUtils.isEmpty(params)) {
-        createTime = params.get("createTime");
-        }
-          
-        queryWrapper.eq(StrUtil.isNotBlank(username), "username", username)
-            .like(StrUtil.isNotBlank(nickname), "nickname", "%"+nickname+"%")
-            .between("age", 18, 60)
-            .eq("idCard.name","技术部")
-            //.in("age",new Integer[]{16,25,34})
-            //.and(wrapper -> wrapper.isNull("age").eq("code","89757")) //嵌套的条件之间 用 and 连接
-            .or(wrapper -> wrapper.isNull("age").eq("code","89757")) //嵌套的条件之间 用 or 连接
-            .between(Objects.nonNull(createTime), "createTime", createTime);
-        
-        PageRequest pageRequest = queryRequest.setDefaultSortField("createTime", false).getPageRequest();
-          
-        return dao.findAll(queryWrapper, pageRequest);
-    }
-    
-      打印sql:
-           select
-             sysuser0_.userId as id1_8_,
-             sysuser0_.create_time as create_t2_8_,
-             sysuser0_.create_by as create_b3_8_,
-             sysuser0_.update_by as update_b4_8_,
-             sysuser0_.update_time as update_t5_8_,
-             sysuser0_.age as age6_8_,
-             sysuser0_.avatar as avatar7_8_,
-             sysuser0_.birthday as birthday8_8_,
-             sysuser0_.company_id as company25_8_,
-             sysuser0_.del_flag as del_flag9_8_,
-             sysuser0_.dept_id as dept_id26_8_,
-             sysuser0_.description as descrip10_8_,
-             sysuser0_.email as email11_8_,
-             sysuser0_.last_login_time as last_lo12_8_,
-             sysuser0_.nickname as nicknam13_8_,
-             sysuser0_.password as passwor17_8_,
-             sysuser0_.phone as phone18_8_,
-             sysuser0_.realname as realnam19_8_,
-             sysuser0_.salt as salt20_8_,
-             sysuser0_.sex as sex21_8_,
-             sysuser0_.code as status22_8_,
-             sysuser0_.code as user_co23_8_,
-             sysuser0_.username as usernam24_8_
-         from
-             sys_user sysuser0_
-         left outer join
-             sys_org sysorg1_
-                 on sysuser0_.dept_id=sysorg1_.userId
-         where
-             sysuser0_.username=?
-             and (
-                 sysuser0_.nickname like ?
-             )
-             and (
-                 sysuser0_.age between 18 and 60
-             )
-             and sysorg1_.name=?
-             and (
-                 sysuser0_.age is null
-                 or sysuser0_.code=?
-             )
-             and (
-                 sysuser0_.create_time between ? and ?
-             )
-         order by sysuser0_.create_time desc
-     
-
-```
-
-除了这些常规的条件查询操作,在[jpa-spec](https://github.com/wenhao/jpa-spec)中还有个`Mixed And and Or`, 
-再嵌套个Specification? 有必要么? 一时 想不到 什么时候 需要这样的操作, 不管了, 先抄为敬 O(∩_∩)O哈哈~
-
-Service代码片段示例1:
-```java
-public List<Person> findAll(SearchRequest request) {
-    QueryWrapper<Person> queryWrapper = new QueryWrapper<>()
-        .like("name", "%ac%")
-        .predicate(new QueryWrapper<Person>(Operator.OR).isNull("age").gt("age", 18))
-        .between(Objects.nonNull(createTime), "createTime", '2019-01-02 13:45:56', '2019-10-22 13:45:56');
-
-    return personRepository.findAll(queryWrapper);
-}
-```
-
-Service代码片段示例2:
-```java
-//  JPA Specification原有写法, 当然也ok
-public List<Phone> findAll(SearchRequest request) {
-    QueryWrapper<Person> queryWrapper = new QueryWrapper<>()
-        .between("age", 10, 35)
-        .predicate(StrUtil.isNotBlank(jack.getName()), ((root, query, cb) -> {
-            Join address = root.join("addresses", JoinType.LEFT);
-            return cb.equal(address.get("street"), "Chengdu");
-        }));
-
-    return phoneRepository.findAll(queryWrapper);
-}
 ```
 
 ---
+其他简化jpa开发的工具类
 
 **QueryRequest**
 
@@ -303,150 +198,3 @@ Sort sort = SortUtil.builder().asc("age").desc("createTime").build();
 ```
 
 ----
-
-**sql模板查询**
-
-模板引擎用的enjoy,因为`减少项目依赖,使用更简单,更好用的第三方工具`是本框架的努力方向之一;
-
-Dao中需要使用模板查询的方法,加上注解@TemplateQuery("这个值对应模板文件中的 sql片段名称"),
-注解中不给value赋值,会用方法名去对应模板中匹配;
-sql模板文件应该放到`resources/sql`的目录下,命名方式`实体类.tpl`, sql模板文件中的`sql片段名称`在同一个模板文件中要`唯一`,
-只支持同一个模板文件`#include("sql片段名称")`调用其他sql片段,不支持跨模板文件调用(不难,只是没写代码去实现)
-
-模板语法:
-
-可以[点击这里](https://www.jfinal.com/doc/6-3)看一下enjoy模板引擎的`表达式`和`指令`语法;
-由于只是以`sql代码片段`为单位,使用enjoy模板引擎解析的语义的并缓存的,所以作用域范围局限与此;
-
-
-| 语法 | 释义 | 说明 |
-| -------- | --------- | -------- |
-| ### | 注释 | 3个#, 只支持行内注释, 不支持块注释 |
-| #@@# 名称 | sql片段名称 | 中间有没有空格都行, 名称在此模板中唯一 |
-| #include("sql片段名称") | 引用sql片段 | 不支持跨模板文件引用 |
-| #(变量名称) | 取值 | 变量名称不需要引号 |
-| ?? | 空安全 | 参考https://www.jfinal.com/doc/6-4 |
-| #if | if 指令 | 参考https://www.jfinal.com/doc/6-4 |
-| #for | for 指令 | 参考https://www.jfinal.com/doc/6-4 |
-
-`###`、`#@@#`、`#include`, 非enjoy自带语法, `#include`是写java代码实现的,
-enjoy的`#set`、`#define`指令 在模板文件中是无效的;
-
-
-Dao代码片段示例:
-
-```java
-@Repository
-public interface SysRoleRepository extends BaseRepository<SysRole,Long> {
-    // 以下几个方法都会调用 对应模板文件中的 名称为 findAllByTemplate 的sql代码片段
-    
-    // 注解中的value匹配 对应模板文件中的 sql代码片段名称
-	@TemplateQuery("findAllByTemplate")
-	List<SysRole> findAbc123(); // 不传参数
-
-    // 注解没有value值,会用这个方法名去模板中匹配
-    // 模板中使用的变量名 ids 判断/取值
-	@TemplateQuery
-	List<SysRole> findAllByTemplate(@Param("ids")List<Long> ids);
-
-
-    // 模板中使用SysRole的变属性做为变量名判断/取值
-	@TemplateQuery
-    List<SysRole> findAllByTemplate(SysRole sysRole); 
-
-    // 排序查询: 用List接收,参数传入Sort, 模板中 不需要写 排序的sql代码
-	@TemplateQuery
-    List<SysRole> findAllByTemplate(SysRole sysRole, Sort sort);
-
-    // 分页排序查询: 用Page接收,参数传入Pageable, 模板中 不需要写 分页排序的sql代码
-	@TemplateQuery
-	Page<SysRole> findAllByTemplate(SysRole sysRole, Pageable pageable);
-
-}
-```
-
-sql模板文件代码示例:
-
-```sql
-#@@# columns
-sr.id, sr.parent_id, sr.name, sr.code, sr.remark, sr.sort_no, sr.status, sr.data_scope,
-    (SELECT GROUP_CONCAT(srd.dept_id) as data_dept_ids FROM sys_role_dept srd WHERE srd.role_id = sr.id) as data_dept_ids,
-    sr.create_time,sr.create_by,sr.update_by,sr.update_time,sr.del_flag
-
-
-### sql片段名称为 findAllByTemplate
-#@@# findAllByTemplate
-SELECT
-    #include("columns")
-FROM
-    sys_role sr ###LEFT JOIN sys_user su ON sr.create_by = su.user_id
-WHERE 1=1 AND sr.del_flag = '0'
-    #if(name??)　### 属性: name　值: '户'
-     AND sr.name LIKE CONCAT('%',#(name),'%')
-    #end
-    #if(params?? && params.createTime??) ### params(Map), key: 'createTime' , value: {'2019-06-01','2019-09-29'}
-     AND date_format(sr.create_time,'%Y-%m-%d') BETWEEN #(params.createTime[0]) AND #(params.createTime[1])
-    #end
-    #if(params?? && params.dataScope??)
-     #(params.dataScope)
-    #end
-    AND 1 IN #(dataDeptIds) ### 传入参数 List<Long> dataDeptIds = Arrays.asList(1L,2L,3L,4L);
-    AND 'a' IN #(stringsIds) ### 传入参数 List<String> stringsIds = Arrays.asList("a","b","c");
-
-### 控制台打印sql如下:
-### SELECT
-###     sr.*
-### FROM
-###     sys_role sr
-### LEFT JOIN
-###     sys_user su
-###         ON sr.create_by = su.user_id
-### WHERE
-###     1=1
-###     AND sr.name LIKE CONCAT('%','户','%')
-###     AND date_format(sr.create_time,'%Y-%m-%d') BETWEEN '2019-06-01' AND '2019-09-29'
-###     AND 1 IN (1,2,3,4)
-###     AND 'a' IN ('a','b','c')
-```
-
-Dao接收模板查询结果数据方式:
-
-String/基本数据类型以及包装类/实体类/List<实体类>/List<pojo>/Page<实体类>/Page<pojo>/Map<String,Object>/List<Map<String,Object>>
-
-Map方式比较特殊, 举个例子:
-
-Dao
-```java
-/**
-* 获取系统近七天来的访问记录
-*/
-@TemplateQuery
-List<Map<String, Object>> findLastSevenDaysVisitCount(SysUser user);
-```
-模板文件
-```sql
-#@@# findLastSevenDaysVisitCount
-SELECT
-    date_format(l.login_time, '%m-%d') days, count(1) count
-FROM
-    (SELECT * FROM sys_login_log where date_sub(curdate(), interval 7 day) <= date(login_time) ) as l
-WHERE 1=1
-    #if(userId??)
-        AND l.user_id = #(userId)
-    #end
-GROUP BY days
-
-
-### 变量 userId 值 传入 1
-### 打印sql: SELECT date_format(l.login_time, '%m-%d') days,  count(1) count 
-###         FROM (SELECT * FROM sys_login_log where date_sub(curdate(), interval 7 day) <= date(login_time) ) as l
-###         WHERE 1=1  AND l.user_id = 1 GROUP BY days
-```
-
-
-
-[1] 传入参数名`params.xxx`,`params.yyy`, 会 接收到Map属性`params`中
-
-[2] 非首字母如果是大写转换成`_小写`,实体类名称`SysUser`,表名称`sys_user`;属性名称`firstName`,表字段名称`first_name`
-
-[3] @Query(value="...",nativeQuery = true)或sql模板文件,使用的是原生sql查询

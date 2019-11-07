@@ -30,7 +30,7 @@ spring:
       enabled: true
       force: true
   profiles:
-    active: dev
+    active: dev #dev pro
   servlet:
     multipart:
       # 单个文件最大

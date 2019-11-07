@@ -26,7 +26,7 @@ module.exports = {
     }
   },
   devServer: {
-    port: 8081,
+    port: 80,
     proxy: 'http://localhost:9081',
     open: true // 项目启动时是否自动打开浏览器，我这里设置为false,不打开，true表示打开
   }

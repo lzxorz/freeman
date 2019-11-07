@@ -4,9 +4,8 @@ package com.freeman.sys.service.impl;
 import com.freeman.common.base.domain.Tree;
 import com.freeman.common.base.service.impl.BaseServiceImpl;
 import com.freeman.common.utils.StrUtil;
-import com.freeman.common.utils.TreeUtil;
+import com.freeman.common.base.domain.TreeUtil;
 import com.freeman.spring.data.repository.NativeSqlQuery;
-import com.freeman.sys.domain.SysLog;
 import com.freeman.sys.domain.SysOrg;
 import com.freeman.sys.repository.SysOrgRepository;
 import com.freeman.sys.service.ISysOrgService;
@@ -19,7 +18,6 @@ import org.springframework.util.ObjectUtils;
 import javax.persistence.StoredProcedureQuery;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j

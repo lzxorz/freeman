@@ -3,7 +3,7 @@ package com.freeman.sys.controller;
 
 import cn.hutool.core.convert.Convert;
 import com.freeman.common.log.Log;
-import com.freeman.common.dataPermission.DataPermUtil;
+import com.freeman.common.dataPerm.DataPermUtil;
 import com.freeman.spring.data.utils.request.QueryRequest;
 import com.freeman.common.result.R;
 import com.freeman.common.base.controller.BaseController;
