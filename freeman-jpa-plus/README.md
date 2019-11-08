@@ -83,6 +83,8 @@ public class SysOrgServiceImpl extends BaseServiceImpl<SysOrgRepository, SysOrg,
 
 ### jpa-plus使用说明
 
+    像原生sql一样简单,像原生sql一样复杂
+
 sevice层的方法中
 ```java
 NativeSqlQuery nativeSql = NativeSqlQuery.builder()
@@ -128,6 +130,8 @@ NativeSqlQuery nativeSql = NativeSqlQuery.builder()
 sevice层的方法中
 ```java
  
+    // 像原生sql一样简单. 也可以原生sql一样写到很复杂
+    
     Object createTime = jobLog.getParams("createTime"); //传进来是创建起止时间的数组
 
     NativeSqlQuery nativeSql = NativeSqlQuery.builder()
@@ -177,23 +181,22 @@ dao.findAll(sort);
 
 **PageUtil、SortUtil**
 
-查询需要排序或分页, 但是这些参数不是前端传过来的, 本来JPA干这事儿就是个高手, 但是, 还能更优秀;
-支持多字段排序是必须的, 而且做到了 看一眼就知道怎么用;
+查询需要排序或分页, 但是这些参数不是前端传过来的。JPA本来就是这方面的高手, 但是, 还能更优秀。
+PageUtil可以更简单构建多字段排序的PageRequest。
 
 代码片段示例:
 
 ```java
-// 如果分页参数, 有默认备用值`pageNo`=0,`pageSize`=20;
-PageRequest pageRequest = PageUtil.builder().pageNo(0).pageSize(20).asc("age").desc("createTime").build();
+// 如果需要分页参数, PageUtil有默认备用值`pageNo`=0,`pageSize`=20;
+PageRequest pageRequest = PageUtil.builder().pageNo(0).pageSize(50).asc("age").desc("createTime").build();
 
-// 如果只需要分页 不需要排序 // 当然是jpa 自带写法 更简单
-//PageRequest pageRequest = PageUtil.builder().pageNo(0).pageSize(20).build();
+// 如果只需要分页 不需要排序 // 应该用jpa 自带写法
 PageRequest pageRequest = PageRequest.of(1,30);
 
 // 如果只需要排序 不需要分页 // getSort();
 Sort sort = PageUtil.builder().asc("age").desc("createTime").build().getSort();
 
-// 如果只需要排序 不需要分页 // 也可以使用只处理工具类 SortUtil
+// 如果只需要排序 不需要分页 // 也可以使用工具类 SortUtil
 Sort sort = SortUtil.builder().asc("age").desc("createTime").build();
 ```
 
