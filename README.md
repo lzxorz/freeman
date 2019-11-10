@@ -27,7 +27,7 @@ jpa`动态条件查询写起来麻烦`，`项目的逻辑复杂的时候，代�
 使用目前流行的WEB开发架构技术，如 SpringBoot,Mybatis, jpa(Hibernate),Apache Shiro ,JWT 等等，目前仅保证对MySQL数据库的完美支持。 分层设计：使用分层设计，分为dao，service，Controller，低耦合，高内聚。
 
 #### 安全考虑
-严格遵循了web安全的规范，前后端交互使用了JWT，参数编码传输，密码md5加密存储，shiro权限验证，从根本上避免了SQL注入，XSS攻击，CSRF攻击等常见的web攻击手段。
+严格遵循了web安全的规范，前后端交互使用了JWT，参数编码传输，密码md5加密存储，shiro权限验证，XSS统一过滤器。
 
 #### 令牌刷新方式
 前端axios请求拦截器自动把令牌放入head，axios响应拦截器中检查有`newToken`标记，有就更新保存的令牌。后端shiro拦截需要权限的接口，每次都拿到JWT进行认证。采用CAS机制+刚过期令牌续期30秒，实现用户无感知刷新，
@@ -37,7 +37,7 @@ jpa`动态条件查询写起来麻烦`，`项目的逻辑复杂的时候，代�
 
 **开发文档**  [https://lzxorz.github.io/zh-cn/docs/doc1.html](https://lzxorz.github.io/zh-cn/docs/doc1.html)
 
-**体验地址**  [http://139.199.112.93](http://139.199.112.93)
+**体验地址**  [http://47.105.42.254](http://47.105.42.254)
 
 **账号、密码** ```system/123456```
 
