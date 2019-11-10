@@ -32,7 +32,7 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","com.freeman.FreemanApplication"]
 #4. 创建容器,并启动(如果存在,先删除), 预览效果
 #   docker run -it --rm -p 9081:9081 --name freeman-app -v /etc/localtime:/etc/localtime freeman:test
 #5. 创建容器,在后台启动(预览能正常启动后)
-#   docker run -d-p 9081:9081 --name freeman-app -v /etc/localtime:/etc/localtime freeman:test
+#   docker run -d -p 9081:9081 --name freeman-app -v /etc/localtime:/etc/localtime freeman:test
 #
 #到此部署成功。
 
