@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -47,12 +46,12 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleRepository, SysRo
         Object createTime = sysRole.getParams("createTime"); //传进来是数组
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
                 .from("sys_role sr")
-                .contains("sr.name", sysRole.getName())
-                .between( "date_format(sr.create_time,'%Y-%m-%d')", createTime)
+                .where(w -> w.contains("sr.name", sysRole.getName())
+                .between( "date_format(sr.create_time,'%Y-%m-%d')", (List)createTime)
                 .eq("sr.status", DictUtil.getDictValue("sys_status", "有效", "1"))
-                .sqlStrPart((String)sysRole.getParams("dataScope"))
+                .sqlStrPart((String)sysRole.getParams("dataScope")))
                 .orderBy("sr.sort_no asc");
-        List<SysRole> reslutList = dao.findAllByNativeSql(nativeSqlQuery, SysRole.class);
+        List<SysRole> reslutList = dao.findAllBySql(nativeSqlQuery, SysRole.class);
         return reslutList;
     }
 
@@ -123,9 +122,9 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleRepository, SysRo
     public List<SysRole> findRoleDictItems(String dictType) {
 
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
-            .eq("status", DictUtil.getDictValue("sys_status", "有效", "1"))
-            .orderBy("sort_no asc");
-        List<SysRole> reslutList = dao.findAllByNativeSql(nativeSqlQuery, SysRole.class);
+                .where(w -> w.eq("status", DictUtil.getDictValue("sys_status", "有效", "1")))
+                .orderBy("sort_no asc");
+        List<SysRole> reslutList = dao.findAllBySql(nativeSqlQuery, SysRole.class);
 
         return reslutList;
     }

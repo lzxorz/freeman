@@ -18,6 +18,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.print.attribute.standard.MediaSize;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
@@ -129,33 +130,34 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
         return result;
     }
 
-    @Override
-    public List findAllByNativeSql(NativeSqlQuery nativeSql, Class<?> resultClass) {
-        String sqlStr = nativeSql.toSqlStr();
-        //获取总记录数
-        Session session = em.unwrap(Session.class);
-        Query countQuery = session.createNativeQuery("select count(*) from (" + sqlStr + ") as t");
-
-        //获取分页结果
-        Query pageQuery = session.createNativeQuery(sqlStr);
-
-        long totalRecord = ((Number) countQuery.getSingleResult()).longValue();
-        List result = totalRecord == 0 ? new ArrayList<>(0) :
-                pageQuery.unwrap(NativeQueryImpl.class).setResultTransformer(new AliasToBeanTransformer(resultClass)).list();
-        return result;
-
+    /***********************************sql*************************************************/
+    // select * where id = ?1 name = ?2 ...
+    public List<?> findAllBySql(String sql, Class<?> clazz, Object... params) {
+        Query query = em.unwrap(Session.class).createNativeQuery(sql);
+        setParameters(query, params);
+        return query.unwrap(NativeQueryImpl.class).setResultTransformer(new AliasToBeanTransformer(clazz)).list();
     }
 
     @Override
-    public Page findAllByNativeSql(NativeSqlQuery nativeSql, Class<?> resultClass, Pageable pageable) {
+    public List<?> findAllBySql(NativeSqlQuery nativeSql, Class<?> resultClass) {
+        Query query = em.unwrap(Session.class).createNativeQuery(nativeSql.toSqlStr());
+        setParameters(query, nativeSql.getParams());
+        return query.unwrap(NativeQueryImpl.class).setResultTransformer(new AliasToBeanTransformer(resultClass)).list();
+    }
+
+    @Override
+    public Page findAllBySql(NativeSqlQuery nativeSql, Class<?> resultClass, Pageable pageable) {
         String sqlStr = nativeSql.toSqlStr();
 
         //获取总记录数
         Session session = em.unwrap(Session.class);
-        javax.persistence.Query countQuery = session.createNativeQuery("select count(*) from (" + sqlStr + ") as t");
+        Query countQuery = session.createNativeQuery("select count(*) from (" + sqlStr + ") as t");
+        setParameters(countQuery, nativeSql.getParams());
+
 
         //获取分页结果
         Query pageQuery = session.createNativeQuery(sqlStr);
+        setParameters(pageQuery, nativeSql.getParams());
 
         long totalRecord = ((Number) countQuery.getSingleResult()).longValue();
         List result = totalRecord == 0 ? new ArrayList<>(0) :
@@ -170,8 +172,8 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
         return new PageImpl<>(result,pageable,totalRecord);
     }
 
-    
-    /************************************************************************************/
+
+    /***********************************ql*************************************************/
 
     /** 根据ql和按照索引顺序的params查询一个实体 */
     public T findOneByQL(final String ql, final Object... params) {
@@ -226,40 +228,37 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
         return (Long) query.getSingleResult();
     }
 
+    /************************************************************************************/
+
     /** 拼排序 */
     private String prepareOrder(Sort sort) {
         return (sort == null || !sort.iterator().hasNext()) ? "" :
                 (" order by " + sort.toString().replace(":", " "));
     }
-    
-    @SuppressWarnings("unchecked")
-    public List<?> findAllBySQL(String sql, Map<String, Object> params, Class<?> clazz) {
-        Query query = em.createNativeQuery(sql, clazz);
-        if (params != null) {
-            for (String key : params.keySet()) {
-                query.setParameter(key, params.get(key));
-            }
-        }
-        return query.getResultList();
-    }
 
-    /** 获取记录条数 */
-    public Integer countBySQL(String sql, Map<String, Object> params) {
-        Query query = em.createNativeQuery(sql);
-        if (params != null) {
-            for (String key : params.keySet()) {
-                query.setParameter(key, params.get(key));
-            }
-        }
-        BigInteger bigInteger = (BigInteger) query.getSingleResult();
-        return bigInteger.intValue();
-    }
+    /** 按列名设置Query参数 */
+    // private void setParameters(Query query, Map<String, Object> params) {
+    //     if (params != null) {
+    //         for (String key : params.keySet()) {
+    //             query.setParameter(key, params.get(key));
+    //         }
+    //     }
+    // }
 
     /** 按顺序设置Query参数 */
     private void setParameters(Query query, Object[] params) {
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
                 query.setParameter(i + 1, params[i]);
+            }
+        }
+    }
+
+    /** 按顺序设置Query参数 */
+    private void setParameters(Query query, List params) {
+        if (params != null) {
+            for (int i = 0; i < params.size(); i++) {
+                query.setParameter(i + 1, params.get(i));
             }
         }
     }

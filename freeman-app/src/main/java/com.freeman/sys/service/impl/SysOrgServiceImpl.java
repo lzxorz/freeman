@@ -64,14 +64,14 @@ public class SysOrgServiceImpl extends BaseServiceImpl<SysOrgRepository, SysOrg,
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
                 .from("sys_org so")
-                .eq("so.id", org.getId())
+                .where(w -> w.eq("so.id", org.getId())
                 .contains("so.name", org.getName())
-                .between( "date_format(so.create_time,'%Y-%m-%d')", createTime)
-                .sqlStrPart((String)org.getParams("dataScope"))
+                .between( "date_format(so.create_time,'%Y-%m-%d')", (List)createTime)
+                .sqlStrPart((String)org.getParams("dataScope")))
                 .orderBy(orderBy!=null ? ("so." + orderBy) : "")
                 .build();
 
-        return dao.findAllByNativeSql(nativeSql, SysOrg.class);
+        return dao.findAllBySql(nativeSql, SysOrg.class);
     }
 
 

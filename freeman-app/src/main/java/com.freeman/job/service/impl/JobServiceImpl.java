@@ -22,7 +22,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -59,15 +58,16 @@ public class JobServiceImpl extends BaseServiceImpl<JobRepository, Job,Long> imp
         Object createTime = job.getParams("createTime"); //传进来是数组
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
-                .select("t_job")
-                .eq( "bean_name", job.getBeanName())
+                .select("*")
+                .from("t_job")
+                .where(w -> w.eq( "bean_name", job.getBeanName())
                 .eq( "method_name", job.getMethodName())
                 .contains("parameter", job.getParameter())
                 .contains("remark", job.getRemark())
                 .eq( "status", job.getStatus())
-                .between( "date_format(create_time,'%Y-%m-%d')", createTime);
+                .between( "date_format(create_time,'%Y-%m-%d')", (List)createTime));
 
-        return dao.findAllByNativeSql(nativeSql, Job.class, pageRequest);
+        return dao.findAllBySql(nativeSql, Job.class, pageRequest);
     }
 
 

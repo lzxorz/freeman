@@ -1,14 +1,13 @@
 package com.freeman;
 
 
-import cn.hutool.core.lang.Console;
+import cn.hutool.core.date.DateTime;
 import com.freeman.common.utils.BeanUtil;
-import com.freeman.common.utils.StrUtil;
-import com.freeman.domain.Phone;
 import com.freeman.domain.User;
-import com.freeman.repository.PhoneRepository;
-import com.freeman.repository.UserRepository;
 import com.freeman.spring.data.domain.Model;
+import com.freeman.spring.data.repository.NativeSqlQuery;
+import com.freeman.sys.domain.SysUser;
+import com.freeman.sys.repository.SysUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,13 +17,10 @@ import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -135,5 +131,52 @@ public class TestUser {
         Properties object = yamlFactory.getObject();
         System.out.println(object);
     }
+
+    //@Autowired
+    //private Environment env;
+    @Autowired
+    private SysUserRepository userRepository;
+
+    @Test
+    public void testNativeSQL() {
+        // 模拟接收到的请求参数
+        SysUser user = new SysUser();
+        user.setUsername("system");
+        user.setNickname("eye");
+        user.setCreateTime(new DateTime());
+        user.putParam("ids", Arrays.asList(1L, 2L, 3L));
+        user.putParam("ages",Arrays.asList(20, 40));
+
+        NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
+                .select("u.id, u.username")
+                .from("sys_user u")
+                .where(w -> w.eq("u.username", user.getUsername())
+                    .contains("u.nickname", user.getNickname())
+                    .lt("u.create_time", new Date())
+                    .in("u.id", (List)user.getParams("ids"))
+                    .between("u.age", (List)user.getParams("ages")))
+                .groupBy("u.id")
+                .orderBy("u.id");
+
+        List<SysUser> allBySQL = userRepository.findAllBySql(nativeSqlQuery, SysUser.class);
+        System.out.println("ok");
+    }
+
+    @Test
+    public void testNativeSQL1() {
+        String sql = "select u.id, u.username from sys_user u where u.username = ?1 and u.create_time < ?2 and u.id in ?3";
+        List<?> allBySQL = userRepository.findAllBySql(sql, SysUser.class, "system", new Date(), Arrays.asList(1L, 2L, 3L));
+        System.out.println("ok");
+    }
+
+    // @Test
+    // public void testNativeSQL2() {
+    //     String sql = "select u.id, u.username from sys_user u where u.username = :u.username and u.create_time < :u.create_time";
+    //     HashMap<String, Object> params = MapUtil.newHashMap();
+    //     params.put("u.username", "system");
+    //     params.put("u.create_time", new Date());
+    //     List<?> allBySQL = userRepository.findAllBySQL(sql, SysUser.class, params);
+    //     System.out.println("ok");
+    // }
 
 }

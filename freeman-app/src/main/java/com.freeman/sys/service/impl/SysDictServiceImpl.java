@@ -41,8 +41,8 @@ public class SysDictServiceImpl extends BaseServiceImpl<SysDictRepository, SysDi
     public Page<SysDict> findAll(SysDict dict, Pageable pageable) {
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
                 .from("sys_dict")
-                .eq("name", dict.getName());
-        return dao.findAllByNativeSql(nativeSqlQuery, SysDict.class, pageable);
+                .where(w -> w.eq("name", dict.getName()));
+        return dao.findAllBySql(nativeSqlQuery, SysDict.class, pageable);
     }
 
 
@@ -74,9 +74,9 @@ public class SysDictServiceImpl extends BaseServiceImpl<SysDictRepository, SysDi
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
                 .select("sdi.*")
                 .from("sys_dict_item sdi")
-                .eq("sdi.type", dictType)
+                .where(w -> w.eq("sdi.type", dictType))
                 .orderBy("sdi.sort_no asc");
-        List<SysDictItem> all = dictDataDao.findAllByNativeSql(nativeSqlQuery, SysDictItem.class);
+        List<SysDictItem> all = dictDataDao.findAllBySql(nativeSqlQuery, SysDictItem.class);
 
         jedisDao.hset(Constants.CACHE.DICT_PREFIX, dictType, JSON.toJSONString(all));
 

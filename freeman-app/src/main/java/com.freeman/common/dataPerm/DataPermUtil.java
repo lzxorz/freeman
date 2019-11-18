@@ -106,7 +106,7 @@ public class DataPermUtil {
         }
         if (!ObjectUtils.isEmpty(segments)){
             // 拼接角色的数据范围
-            StringJoiner sqlStr = new StringJoiner("OR "," (",")");
+            StringJoiner sqlStr = new StringJoiner("OR ","(",")");
             for (String segment : segments) {
                 sqlStr.add(segment);
             }

@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : docker-mysql5.7
+ Source Server         : 139.199.112.93_docker-mysql
  Source Server Type    : MySQL
  Source Server Version : 50727
- Source Host           : localhost:3306
+ Source Host           : 139.199.112.93:3307
  Source Schema         : freeman
 
  Target Server Type    : MySQL
  Target Server Version : 50727
  File Encoding         : 65001
 
- Date: 04/11/2019 22:20:00
+ Date: 10/11/2019 20:42:09
 */
 
 SET NAMES utf8mb4;
@@ -378,6 +378,9 @@ INSERT INTO `sys_log` VALUES (1191350508376428544, 1, 'system', 'Linux', 'Chrome
 INSERT INTO `sys_log` VALUES (1191351603119132672, 1, 'system', 'Linux', 'Chrome', '73.0.3683.86', '127.0.0.1', '0|0|0|内网IP|内网IP', '查看用户', '/sys/user', 'com.freeman.sys.controller.SysUserController.userList()', '{\"pageSize\":[\"10\"],\"pageNum\":[\"1\"],\"_t\":[\"1572875330666\"]}', 51, NULL, '2019-11-04 07:48:51');
 INSERT INTO `sys_log` VALUES (1191351737143922688, 1, 'system', 'Linux', 'Chrome', '73.0.3683.86', '127.0.0.1', '0|0|0|内网IP|内网IP', '查看用户', '/sys/user', 'com.freeman.sys.controller.SysUserController.userList()', '{\"pageSize\":[\"10\"],\"pageNum\":[\"1\"],\"_t\":[\"1572875362947\"]}', 17, NULL, '2019-11-04 07:49:23');
 INSERT INTO `sys_log` VALUES (1191353604120907776, 1, 'system', 'Linux', 'Chrome', '73.0.3683.86', '127.0.0.1', '0|0|0|内网IP|内网IP', '查看用户', '/sys/user', 'com.freeman.sys.controller.SysUserController.userList()', '{\"pageSize\":[\"10\"],\"pageNum\":[\"1\"],\"_t\":[\"1572875807757\"]}', 51, NULL, '2019-11-04 07:56:48');
+INSERT INTO `sys_log` VALUES (1191604826530779136, 1, 'system', 'Linux', 'Chrome', '73.0.3683.86', '172.17.0.1', '0|0|0|内网IP|内网IP', '查看用户', '/sys/user', 'com.freeman.sys.controller.SysUserController.userList()', '{\"pageSize\":[\"10\"],\"pageNum\":[\"1\"],\"_t\":[\"1572935700314\"]}', 1302, NULL, '2019-11-05 00:35:04');
+INSERT INTO `sys_log` VALUES (1191604837574381568, 1, 'system', 'Linux', 'Chrome', '73.0.3683.86', '172.17.0.1', '0|0|0|内网IP|内网IP', '查看用户', '/sys/user', 'com.freeman.sys.controller.SysUserController.userList()', '{\"pageSize\":[\"10\"],\"pageNum\":[\"1\"],\"_t\":[\"1572935704422\"]}', 1290, NULL, '2019-11-05 00:35:07');
+INSERT INTO `sys_log` VALUES (1191913932550443008, 1, 'system', 'Linux', 'Chrome', '73.0.3683.86', '127.0.0.1', '0|0|0|内网IP|内网IP', '查看用户', '/sys/user', 'com.freeman.sys.controller.SysUserController.userList()', '{\"pageSize\":[\"10\"],\"pageNum\":[\"1\"],\"_t\":[\"1573009397484\"]}', 1103, NULL, '2019-11-05 21:03:21');
 
 -- ----------------------------
 -- Table structure for sys_login_log
@@ -463,6 +466,8 @@ INSERT INTO `sys_login_log` VALUES (1191348728666132480, 1, 'system', '2019-11-0
 INSERT INTO `sys_login_log` VALUES (1191350391267266560, 1, 'system', '2019-11-04 07:44:02', '0|0|0|内网IP|内网IP', '127.0.0.1');
 INSERT INTO `sys_login_log` VALUES (1191354664755531776, 1, 'system', '2019-11-04 08:01:01', '0|0|0|内网IP|内网IP', '127.0.0.1');
 INSERT INTO `sys_login_log` VALUES (1191357414260215808, 1, 'system', '2019-11-04 08:11:57', '0|0|0|内网IP|内网IP', '127.0.0.1');
+INSERT INTO `sys_login_log` VALUES (1191604710386307072, 1, 'system', '2019-11-05 00:34:37', '0|0|0|内网IP|内网IP', '172.17.0.1');
+INSERT INTO `sys_login_log` VALUES (1191913440181096448, 1, 'system', '2019-11-05 21:01:23', '0|0|0|内网IP|内网IP', '127.0.0.1');
 
 -- ----------------------------
 -- Table structure for sys_org
@@ -806,7 +811,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 0, 'system', NULL, NULL, '', 'e295f9d10483a522cbc07879408ec14c', '2da00a9b5d49ad9f', 'avatar.jpg', '2', 31, NULL, 'hao123@gmail.com', '13455533233', '喵喵～', '2019-11-04 08:11:57', 1, '2017-07-09 15:47:19', 1, '2019-08-08 10:46:42', '1', NULL, NULL, NULL);
+INSERT INTO `sys_user` VALUES (1, 0, 'system', NULL, NULL, '', 'e295f9d10483a522cbc07879408ec14c', '2da00a9b5d49ad9f', 'avatar.jpg', '2', 31, NULL, 'hao123@gmail.com', '13455533233', '喵喵～', '2019-11-05 21:01:23', 1, '2017-07-09 15:47:19', 1, '2019-08-08 10:46:42', '1', NULL, NULL, NULL);
 INSERT INTO `sys_user` VALUES (2, 2, 'admin', NULL, NULL, '', 'af6de4fabc184c0c37944d0f3d185ea1', '31fc4012f2370528', 'jZUIxmJycoymBprLOUbT.png', '1', 22, NULL, 'admin@qq.com', '15134627380', 'Who am i,tell me', '2019-09-06 21:08:52', 1, '2017-12-29 16:16:39', 1, '2019-01-18 00:59:09', '1', NULL, NULL, NULL);
 INSERT INTO `sys_user` VALUES (12, 2, 'manager', NULL, NULL, '', 'df9ab6549dcf1b43708a4f8f187f0cf8', '31fc4012f2370528', 'default.jpg', '2', 113, NULL, 'jim@foxmail.com', '13721212121', 'how instesting', '2019-07-24 08:52:03', 1, '2018-12-10 07:34:05', 1, '2019-08-11 08:33:40', '1', NULL, NULL, NULL);
 INSERT INTO `sys_user` VALUES (14, 12, 'guest', NULL, NULL, '', '552649f10640385d0728a80a4242893e', '1', 'default.jpg', '1', 145, NULL, 'jackma@hotmail.com', NULL, 'amazing', '2019-07-24 08:52:03', 1, '2018-12-18 07:36:08', 1, '2019-01-24 03:08:01', '1', NULL, NULL, NULL);

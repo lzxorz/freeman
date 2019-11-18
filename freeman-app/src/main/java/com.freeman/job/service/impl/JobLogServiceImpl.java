@@ -2,7 +2,6 @@ package com.freeman.job.service.impl;
 
 
 import com.freeman.common.base.service.impl.BaseServiceImpl;
-import com.freeman.common.utils.StrUtil;
 import com.freeman.job.domain.JobLog;
 import com.freeman.job.repository.JobLogRepository;
 import com.freeman.job.service.IJobLogService;
@@ -14,7 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -31,14 +30,13 @@ public class JobLogServiceImpl extends BaseServiceImpl<JobLogRepository, JobLog,
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
             .from("t_job_log")
-            .eq( "bean_name", jobLog.getBeanName())
+            .where(w -> w.eq( "bean_name", jobLog.getBeanName())
             .eq( "method_name", jobLog.getMethodName())
             .contains("parameter", jobLog.getParameter())
             .eq( "status", jobLog.getStatus())
-            .between( "date_format(create_time,'%Y-%m-%d')", createTime)
-            .build();
+            .between( "date_format(create_time,'%Y-%m-%d')", (List)createTime));
 
-        return dao.findAllByNativeSql(nativeSql, JobLog.class, pageRequest);
+        return dao.findAllBySql(nativeSql, JobLog.class, pageRequest);
     }
 
 

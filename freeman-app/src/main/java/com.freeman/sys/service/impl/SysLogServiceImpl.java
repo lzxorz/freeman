@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.freeman.common.log.Log;
 import com.freeman.common.base.service.impl.BaseServiceImpl;
-import com.freeman.common.utils.StrUtil;
 import com.freeman.common.utils.network.IPUtil;
 import com.freeman.spring.data.repository.NativeSqlQuery;
 import com.freeman.spring.data.utils.request.QueryRequest;
@@ -43,13 +42,13 @@ public class SysLogServiceImpl extends BaseServiceImpl<SysLogRepository, SysLog,
 
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
                 .from("sys_log")
-            .eq("username", sysLog.getUsername())
-            .contains("operation", sysLog.getOperation())
-            .contains("location", sysLog.getLocation())
-            .between( "date_format(create_time,'%Y-%m-%d')", createTime)
-            .build();
+                .where(w -> w.eq("username", sysLog.getUsername())
+                .contains("operation", sysLog.getOperation())
+                .contains("location", sysLog.getLocation())
+                .between( "date_format(create_time,'%Y-%m-%d')", (List)createTime))
+                .build();
 
-        return dao.findAllByNativeSql(nativeSql, SysLog.class, pageRequest);
+        return dao.findAllBySql(nativeSql, SysLog.class, pageRequest);
     }
 
     @Override

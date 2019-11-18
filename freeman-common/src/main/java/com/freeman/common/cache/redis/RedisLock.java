@@ -36,8 +36,8 @@ public class RedisLock extends AbstractLock {
                 break;
             }
             //System.out.println("线程id:"+Thread.currentThread().getUserId() + "获取锁失败，休眠5秒!时间:"+ LocalTime.now());
-            //休眠5秒
-            sleepBySencond(5);
+            //休眠1秒
+            sleepBySencond(1);
         }
     }
 
@@ -77,16 +77,11 @@ public class RedisLock extends AbstractLock {
         }).start();
     }
 
-    public void isAccessAllowed(String uesrId, String jwt){
-        ///////////
+    /*public void isAccessAllowed(String uesrId, String jwt){
         String luaScript = "if redis.call('get', KEYS[1]) == ARGV[1] then return 1 else return 0 end";
-        /** 刷新key的过期时间 **/
+        *//** 刷新key的过期时间 **//*
         Object rel = jedisDao.getJedis().eval(luaScript, 1, uesrId, jwt, "30");
-        /////////////
-    }
-
-
-
+    }*/
 
     /*public void testLock() {
         //定义线程池

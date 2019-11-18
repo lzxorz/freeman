@@ -9,7 +9,7 @@ moment.locale('zh-cn')
 
 // 创建 axios 实例 ,统一配置
 let AXIOS = axios.create({
-  baseURL: 'http://127.0.0.1:9081/',
+  baseURL: 'http://47.105.42.254:9081',
   responseType: 'json',
   validateStatus (status) {
     // 200 外的状态码都认定为失败

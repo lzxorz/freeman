@@ -111,8 +111,8 @@ public class CacheServiceImpl implements ICacheService {
         if (id == null) return null;
         List<SysUser> users = cacheable( (List<Long> ids) -> {
             NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
-                .select(SysUserRepository.userColumn).from(SysUserRepository.userFrom).in("su.id", ids);
-            List<SysUser> allUser = userRepository.findAllByNativeSql(nativeSqlQuery,SysUser.class);
+                .select(SysUserRepository.userColumn).from(SysUserRepository.userFrom).where(w -> w.in("su.id", ids));
+            List<SysUser> allUser = userRepository.findAllBySql(nativeSqlQuery,SysUser.class);
             return allUser;
         }, SysUser.class, Constants.CACHE.USER_PREFIX, CollectionUtil.newArrayList(id));
 
@@ -166,8 +166,8 @@ public class CacheServiceImpl implements ICacheService {
         if (ObjectUtils.isEmpty(roleIds)) return null;
         List<SysRole> roles = cacheable((List<Long> ids) -> {
             NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
-                .select(SysRoleRepository.roleColumn).from(SysRoleRepository.roleFrom).in("id", ids).build();
-            List<SysRole> all = roleRepository.findAllByNativeSql(nativeSqlQuery,SysRole.class);
+                .select(SysRoleRepository.roleColumn).from(SysRoleRepository.roleFrom).where(w -> w.in("id", ids)).build();
+            List<SysRole> all = roleRepository.findAllBySql(nativeSqlQuery,SysRole.class);
             return all;
         }, SysRole.class, Constants.CACHE.ROLE_PREFIX, roleIds);
 
@@ -179,8 +179,8 @@ public class CacheServiceImpl implements ICacheService {
         if (ObjectUtils.isEmpty(permissionIds)) return null;
         List<SysPermission> permissions = cacheable((List<Long> ids) -> {
             NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
-                    .select(SysPermissionRepository.permissionColumn).from(SysPermissionRepository.permissionFrom).in("id", ids).build();
-            List<SysPermission> all = permissionRepository.findAllByNativeSql(nativeSqlQuery,SysPermission.class);
+                    .select(SysPermissionRepository.permissionColumn).from(SysPermissionRepository.permissionFrom).where(w -> w.in("id", ids)).build();
+            List<SysPermission> all = permissionRepository.findAllBySql(nativeSqlQuery,SysPermission.class);
 
             return all;
         },  SysPermission.class, Constants.CACHE.PERMISSION_PREFIX, permissionIds);
@@ -262,21 +262,21 @@ public class CacheServiceImpl implements ICacheService {
         cachePut((List<Long> ids) -> {
             NativeSqlQuery nativeSql = NativeSqlQuery.builder()
                 .select(SysUserRepository.userColumn).from(SysUserRepository.userFrom).groupBy("su.id").build();
-            List<SysUser> sysUsers = userRepository.findAllByNativeSql(nativeSql, SysUser.class);
+            List<SysUser> sysUsers = userRepository.findAllBySql(nativeSql, SysUser.class);
             return sysUsers;
         }, Constants.CACHE.USER_PREFIX, null);
 
         cachePut((List<Long> ids) -> {
             NativeSqlQuery nativeSql = NativeSqlQuery.builder()
                 .select(SysRoleRepository.roleColumn).from(SysRoleRepository.roleFrom).build();
-            List<SysRole> sysRoles = roleRepository.findAllByNativeSql(nativeSql, SysRole.class);
+            List<SysRole> sysRoles = roleRepository.findAllBySql(nativeSql, SysRole.class);
             return sysRoles;
         }, Constants.CACHE.ROLE_PREFIX, null);
 
         cachePut((List<Long> ids) -> {
             NativeSqlQuery nativeSql = NativeSqlQuery.builder()
                 .select(SysPermissionRepository.permissionColumn).from(SysPermissionRepository.permissionFrom).build();
-            List<SysPermission> sysPermissions = permissionRepository.findAllByNativeSql(nativeSql, SysPermission.class);
+            List<SysPermission> sysPermissions = permissionRepository.findAllBySql(nativeSql, SysPermission.class);
             return sysPermissions;
         }, Constants.CACHE.PERMISSION_PREFIX, null);
     }

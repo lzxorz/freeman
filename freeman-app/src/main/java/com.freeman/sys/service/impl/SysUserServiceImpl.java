@@ -55,17 +55,17 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserRepository, SysUs
         NativeSqlQuery nativeSql = NativeSqlQuery.builder()
             .select(dao.userColumn)
             .from(dao.userFrom)
-            .contains( "su.username", user.getUsername())
+            .where(w -> w.contains( "su.username", user.getUsername())
             .contains( "su.realname", user.getRealname())
             .eq("su.sex", user.getSex())
             .eq("su.dept_id", user.getDeptId())
             .eq("su.status", user.getStatus())
-            .between( "date_format(su.create_time,'%Y-%m-%d')", createTime)
-            .sqlStrPart((String)user.getParams("dataScope"))
+            .between( "date_format(su.create_time,'%Y-%m-%d')", (List)createTime)
+            .sqlStrPart((String)user.getParams("dataScope")))
             .groupBy("su.id")
             .build();
 
-        return dao.findAllByNativeSql(nativeSql, SysUser.class, pageable);
+        return dao.findAllBySql(nativeSql, SysUser.class, pageable);
     }
 
 

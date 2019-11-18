@@ -1,10 +1,11 @@
 package com.freeman.spring.data.repository;
 
-import com.freeman.common.utils.DateUtil;
 import com.freeman.common.utils.StrUtil;
 
 import java.util.*;
-
+import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -14,351 +15,197 @@ import java.util.*;
 
 public class NativeSqlQuery {
 
-    private String selectSegment="*";   // 查询的列
-    private String fromSegment;         // 表别名 要与 select 中的对应
-    private StringJoiner whereSegment;  // where 条件拼接
-    private String sqlStrPart ="";      // 追加到 where 条件尾部的自定义sql字符串片段
-    private String groupBySegment;      //
-    private String havingSegment;       //
-    private String orderBySegment;      // nativeSqlQuery.orderBy("字段 asc,字段 desc"). 注意: 使用这个条件查询构造器时,pageable对象中的排序无效。
+    private String select ="*";   // 查询的列
+    private String from;          // 表别名 要与 select 中的对应
+    private Criterion where;      // where 条件拼接
 
-    public static enum Operator {
-        EQ,NE,LT,LTE,GT,GTE,ISNULL,ISNOTNULL,ISEMPTY,ISNOTEMPTY,LIKE,NOTLIKE,IN,NOTIN,BETWEEN,NOTBETWEEN,AND,OR;
-    }
+    private String groupBy;       //
+    private Criterion having;     //
+    private String orderBy;       // nativeSqlQuery.orderBy("字段 asc,字段 desc"). 注意: 使用这个条件查询构造器时,pageable对象中的排序无效。
 
-    /**
-     * 默认用 and 连接 查询条件
-     */
-    public NativeSqlQuery() { this(Operator.AND); }
+    private int  counts = 0;      // 占位符计数器 ?1 ?2 ?3
+    private List params;          // 占位符对应的参数值
 
-    /**
-     * 指定查询条件之间是用 and 还是 or 连接
-     * @param operator Operator.AND/Operator.OR
-     */
-    public NativeSqlQuery(Operator operator) {
-        this.whereSegment = new StringJoiner(" "+operator.name()+" ");
-    }
 
-    /**
-     * 快捷构建方法
-     */
+    /** 快捷构建方法 */
     public static NativeSqlQuery builder() {
-        return new NativeSqlQuery(Operator.AND);
+        return new NativeSqlQuery();
     }
 
     /** select 要查询的列 */
     public NativeSqlQuery select(String columns){
-        this.selectSegment = columns;
+        this.select = columns;
         return this;
     }
 
     /** from 要查询的表以及关联表 */
     public NativeSqlQuery from(String tableAndJoinTable){
-        this.fromSegment = tableAndJoinTable;
+        this.from = tableAndJoinTable;
         return this;
     }
 
-    /** where 条件 begin */
-    public NativeSqlQuery eq(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " = " + wrappValue(value));
-        }
+    /** where */
+    public NativeSqlQuery where(UnaryOperator<Criterion> func) {
+        this.where = func.apply(new Criterion(Criterion.Operator.AND)); // 条件之间 用 and 连接
         return this;
     }
-
-    public NativeSqlQuery ne(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " != " + wrappValue(value));
-        }
-        return this;
-    }
-    
-    public NativeSqlQuery lt(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " < " + wrappValue(value));
-        }
-        return this;
-    }
-
-    public NativeSqlQuery lte(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " <= " + wrappValue(value));
-        }
-        return this;
-    }
-
-    public NativeSqlQuery gt(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " > " + wrappValue(value));
-        }
-        return this;
-    }
-
-    public NativeSqlQuery gte(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " >= " + wrappValue(value));
-        }
-        return this;
-    }
-
-    public NativeSqlQuery isNull(String columnName){
-        whereSegment.add(columnName + " IS NULL");
-        return this;
-    }
-
-    public NativeSqlQuery isNotNull(String columnName){
-        whereSegment.add(columnName + " IS NOT NULL");
-        return this;
-    }
-
-    /*public NativeSqlQuery like(boolean condition, String columnName, Object value){
-        if (condition && Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE " + wrappValue(value));
-        }
-        return this;
-    }*/
-    public NativeSqlQuery startsWith(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE " + wrappValue(value) + "%");
-        }
-        return this;
-    }
-    public NativeSqlQuery contains(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE %" + wrappValue(value) + "%");
-        }
-        return this;
-    }
-    public NativeSqlQuery endsWith(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " LIKE %" + wrappValue(value));
-        }
-        return this;
-    }
-    /*public NativeSqlQuery notLike(boolean condition, String columnName, Object value) {
-        if (condition && Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE " + wrappValue(value));
-        }
-        return this;
-    }*/
-    public NativeSqlQuery notStartsWith(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE " + wrappValue(value) + "%");
-        }
-        return this;
-    }
-    public NativeSqlQuery notContains(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE %" + wrappValue(value) + "%");
-        }
-        return this;
-    }
-    public NativeSqlQuery notEndsWith(String columnName, Object value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT LIKE %" + wrappValue(value));
-        }
-        return this;
-    }
-
-    public NativeSqlQuery in(String columnName, Object... value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " IN ("+ wrappValue(value) +")");
-        }
-        return this;
-    }
-
-    public NativeSqlQuery notIn(String columnName, Object... value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT IN ("+ wrappValue(value) +")");
-        }
-        return this;
-    }
-
-    public NativeSqlQuery in(String columnName, Collection value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " IN ("+ wrappValue(value) +")");
-        }
-        return this;
-    }
-
-    public NativeSqlQuery notIn(String columnName, Collection value){
-        if (Objects.nonNull(value)) {
-            whereSegment.add(columnName + " NOT IN ("+ wrappValue(value) +")");
-        }
-        return this;
-    }
-
-    public NativeSqlQuery between(String columnName, Object values){
-        if (Objects.nonNull(values)) {
-            Object value1,value2;
-            Object[] objects = null;
-            if (values.getClass().isArray() && ((Object[])values).length == 2) {
-                objects = ((Object[])values);
-            }  else if (values instanceof Collection && ((Collection)values).size() == 2) {
-                objects = ((Collection) values).toArray();
-            }
-            if (objects != null) {
-                value1 = objects[0];
-                value2 = objects[1];
-                whereSegment.add(columnName + " BETWEEN " + wrappValue(value1) + " AND " + wrappValue(value2));
-            }
-        }
-        return this;
-    }
-
-    public NativeSqlQuery notBetween(String columnName, Object values){
-        if (Objects.nonNull(values)) {
-            Object value1,value2;
-            Object[] objects = null;
-            if (values.getClass().isArray() && ((Object[])values).length == 2) {
-                objects = ((Object[])values);
-            }  else if (values instanceof Collection && ((Collection)values).size() == 2) {
-                objects = ((Collection) values).toArray();
-            }
-            if (objects != null) {
-                value1 = objects[0];
-                value2 = objects[1];
-                whereSegment.add(columnName + " NOT BETWEEN " + wrappValue(value1) + " AND " + wrappValue(value2));
-            }
-        }
-        return this;
-    }
-
-    /** 追加到 where条件尾部的自定义sql字符串片段 */
-    public NativeSqlQuery sqlStrPart(String part){
-        this.sqlStrPart = part;
-        return this;
-    }
-    /** where 条件 end */
 
     /** groupBy */
     public NativeSqlQuery groupBy(String groupBySegment){
-        this.groupBySegment = groupBySegment;
+        this.groupBy = groupBySegment;
         return this;
     }
     /** having */
-    public NativeSqlQuery having(String havingSegment){
-        this.havingSegment = havingSegment;
+    public NativeSqlQuery having(UnaryOperator<Criterion> func){
+        this.having = func.apply(new Criterion(Criterion.Operator.AND)); // 条件之间 用 and 连接
         return this;
     }
     /** orderBy */
     public NativeSqlQuery orderBy(String orderBySegment){
-        this.orderBySegment = orderBySegment;
+        this.orderBy = orderBySegment;
         return this;
     }
 
-    /** 这个并没什么用 */
+    /** 这个没什么用 */
     public NativeSqlQuery build(){
         return this;
     }
 
     /** 生成完整的sql */
-    public String toSqlStr() {
+    protected String toSqlStr() {
         StringJoiner sj = new StringJoiner(" ");
-        sj.add("SELECT " + selectSegment);
-        if (StrUtil.isNotBlank(fromSegment)) {
-            sj.add("FROM " + fromSegment);
+        sj.add("SELECT " + select);
+        if (StrUtil.isNotBlank(from)) {
+            sj.add("FROM " + from);
         }
-        if (whereSegment.length()>0) {
-            sj.add("WHERE " + whereSegment.toString());
-            if (StrUtil.isNotBlank(sqlStrPart)) {
-                sj.add(sqlStrPart);
+        if (where != null) {
+            String wh = where.getSegments().toString();
+            if (wh.length() > 0) {
+                sj.add("WHERE " + wh);
+                counts += where.getCounts();
+                params = where.getParams();
             }
-        }else if (StrUtil.isNotBlank(sqlStrPart)) {
-            sj.add("WHERE " + sqlStrPart);
         }
-        if (StrUtil.isNotBlank(groupBySegment)) {
-            sj.add("GROUP BY " + groupBySegment);
+        if (StrUtil.isNotBlank(groupBy)) {
+            sj.add("GROUP BY " + groupBy);
         }
-        if (StrUtil.isNotBlank(havingSegment)) {
-            sj.add("HAVING " + havingSegment);
+
+        if (having != null) {
+            String hv = having.getSegments().toString();
+            if (hv.length() > 0) {
+                sj.add("HAVING " + moveCount(hv, counts));
+                counts += having.getCounts();
+                if (params == null) {
+                    params = having.getParams();
+                } else {
+                    params.addAll(having.getParams());
+                }
+            }
         }
-        if (StrUtil.isNotBlank(orderBySegment)) {
-            sj.add("ORDER BY " + orderBySegment);
+
+        if (StrUtil.isNotBlank(orderBy)) {
+            sj.add(StrUtil.format("ORDER BY {}", orderBy));
         }
-        // System.out.println("生成sql ==> "+sj.toString());
         return sj.toString();
     }
 
 
+
+    protected List getParams() {
+        return params;
+    }
+
+    /** 占位符数字调整 */
+    private static String moveCount(String value, int counts) {
+        StringBuffer sb = new StringBuffer();
+        Matcher m = Pattern.compile("\\?\\d{1,2}").matcher(value);
+
+        while (m.find()) {
+            m.appendReplacement(sb, "?" + (Integer.parseInt(m.group().substring(1))+counts));
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
+
+
     /** 对值进行包装 */
-    private String wrappValue(Object value) {
-        String res = "";
-        // Class<?> clazz = value.getClass();
-        try {
-            if (value instanceof String) { // clazz.isPrimitive() || String.class.isAssignableFrom(clazz)
-                return  "'"+value+"'";
-            } else if (value instanceof Number) { // Number.class.isAssignableFrom(clazz)
-                Class<?> c = value.getClass();
-                if (c == Integer.class) {
-                    res = ""+((Number) value).intValue();
-                } else if (c == Long.class) {
-                    res = ""+((Number) value).longValue();
-                } else if (c == Double.class) {
-                    res = ""+((Number) value).doubleValue();
-                } else if (c == Float.class) {
-                    res = ""+((Number) value).floatValue();
-                } else if (c == Short.class) {
-                    res = ""+((Number) value).shortValue();
-                } else {
-                    res = ""+value.toString();
-                }
-            } else if (value instanceof Boolean) {
-                res = value.toString();
-            } else if (value instanceof Date) { // Date.class.isAssignableFrom(clazz)
-                // "DATE_FORMAT("+ columnName + ",'%Y-%m-%d %H:%i:%s')"
-                res = "'"+DateUtil.format((Date)value, "yyyy-MM-dd HH:mm:ss")+"'";
-            } else if (value.getClass().isArray()) {
-                res = joinArray((Object[])value);
-            }  else if (value instanceof Collection) {
-                res = joinCollection((Collection)value);
-            } /*else if (value instanceof Map) { // Map.class.isAssignableFrom(clazz)
-            }*/else if (value != null) {
-                res = ""+value.toString();
-            }
+    // private String wrappValue(Object value) {
+    //     String res = "";
+    //     // Class<?> clazz = value.getClass();
+    //     try {
+    //         if (value instanceof String) { // clazz.isPrimitive() || String.class.isAssignableFrom(clazz)
+    //             return  "'"+value+"'";
+    //         } else if (value instanceof Number) { // Number.class.isAssignableFrom(clazz)
+    //             Class<?> c = value.getClass();
+    //             if (c == Integer.class) {
+    //                 res = ""+((Number) value).intValue();
+    //             } else if (c == Long.class) {
+    //                 res = ""+((Number) value).longValue();
+    //             } else if (c == Double.class) {
+    //                 res = ""+((Number) value).doubleValue();
+    //             } else if (c == Float.class) {
+    //                 res = ""+((Number) value).floatValue();
+    //             } else if (c == Short.class) {
+    //                 res = ""+((Number) value).shortValue();
+    //             } else {
+    //                 res = ""+value.toString();
+    //             }
+    //         } else if (value instanceof Boolean) {
+    //             res = value.toString();
+    //         } else if (value instanceof Date) { // Date.class.isAssignableFrom(clazz)
+    //             // "DATE_FORMAT("+ columnName + ",'%Y-%m-%d %H:%i:%s')"
+    //             res = "'"+DateUtil.format((Date)value, "yyyy-MM-dd HH:mm:ss")+"'";
+    //         } else if (value.getClass().isArray()) {
+    //             res = joinArray((Object[])value);
+    //         }  else if (value instanceof Collection) {
+    //             res = joinCollection((Collection)value);
+    //         } /*else if (value instanceof Map) { // Map.class.isAssignableFrom(clazz)
+    //         }*/else if (value != null) {
+    //             res = ""+value.toString();
+    //         }
+    //
+    //     } catch (Exception e) {
+    //         throw new RuntimeException("值转换异常 ==> " + value.toString());
+    //     }
+    //     return res;
+    // }
 
-        } catch (Exception e) {
-            throw new RuntimeException("值转换异常 ==> " + value.toString());
-        }
-        return res;
-    }
-
-    private String joinArray(Object[] valueArr) {
-        String res = "()";
-        if(valueArr.length>0){
-            Class<?> type = valueArr.getClass().getComponentType();
-            StringJoiner sj = new StringJoiner(",");
-            if(type == String.class){
-                for (Object v : valueArr) {
-                    sj.add("'"+v.toString()+"'");
-                }
-            }else {
-                for (Object v : valueArr) {
-                    sj.add(wrappValue(v));
-                }
-            }
-            res = sj.toString();
-        }
-        return res;
-    }
-
-    private String joinCollection(Collection value) {
-        String res = "()";
-        Iterator iterator =  value.iterator();
-        if (iterator.hasNext()){
-            StringJoiner sj = new StringJoiner(",");
-            while (iterator.hasNext()) {
-                Object v = iterator.next();
-                if (v instanceof String) {
-                    sj.add("'"+v.toString()+"'");
-                }else {
-                    sj.add(wrappValue(v));
-                }
-            }
-            res =  sj.toString();
-        }
-        return res;
-    }
+    // private String joinArray(Object[] valueArr) {
+    //     String res = "()";
+    //     if(valueArr.length>0){
+    //         Class<?> type = valueArr.getClass().getComponentType();
+    //         StringJoiner sj = new StringJoiner(",");
+    //         if(type == String.class){
+    //             for (Object v : valueArr) {
+    //                 sj.add("'"+v.toString()+"'");
+    //             }
+    //         }else {
+    //             for (Object v : valueArr) {
+    //                 sj.add(wrappValue(v));
+    //             }
+    //         }
+    //         res = sj.toString();
+    //     }
+    //     return res;
+    // }
+    //
+    // private String joinCollection(Collection value) {
+    //     String res = "()";
+    //     Iterator iterator =  value.iterator();
+    //     if (iterator.hasNext()){
+    //         StringJoiner sj = new StringJoiner(",");
+    //         while (iterator.hasNext()) {
+    //             Object v = iterator.next();
+    //             if (v instanceof String) {
+    //                 sj.add("'"+v.toString()+"'");
+    //             }else {
+    //                 sj.add(wrappValue(v));
+    //             }
+    //         }
+    //         res =  sj.toString();
+    //     }
+    //     return res;
+    // }
 
     /*public Boolean isEmpty(Object v) {
         if (v == null) {
@@ -380,5 +227,12 @@ public class NativeSqlQuery {
 
     public Boolean notEmpty(Object v) {
         return !this.isEmpty(v);
+    }*/
+
+    /*public static void main(String[] args) {
+        int c = 12;
+        String sql = "HAVING u.username = ?1 AND u.nickname LIKE ?2 AND u.age BETWEEN ?3 AND ?4 ";
+        String s = moveCount(sql, c);
+        System.out.println(s);
     }*/
 }
