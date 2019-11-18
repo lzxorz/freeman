@@ -92,28 +92,29 @@ NativeSqlQuery nativeSql = NativeSqlQuery.builder()
     .from(表名 AS 表别名 LEFT JOIN 表名 AS 表别名 ON XXX = YYY) //必有
     // where 条件， eq/ne/lt/...可以出现0～n次，生成SQL时 默认用 AND 连接多个where条件
     // 自动判断属性不为null，才会生成对应sql片段
-    .eq(表别名.列名, java属性值/常量值)
-    .ne(表别名.列名, java属性值/常量值)
-    .lt(表别名.列名, java属性值/常量值)
-    .lte(表别名.列名, java属性值/常量值)
-    .gt(表别名.列名, java属性值/常量值)
-    .gte(表别名.列名, java属性值/常量值)
-    .isNull(表别名.列名) // 不需要传值
-    .isNotNull(表别名.列名) // 不需要传值
-    .startsWith(表别名.列名, java属性值/常量值)
-    .contains(表别名.列名, java属性值/常量值)
-    .endsWith(表别名.列名, java属性值/常量值)
-    .notStartsWith(表别名.列名, java属性值/常量值)
-    .notContains(表别名.列名, java属性值/常量值)
-    .notEndsWith(表别名.列名, java属性值/常量值)
-    .in(表别名.列名, java属性值/常量值)         // 传入Array或List
-    .notIn(表别名.列名, java属性值/常量值)      // 传入Array或List
-    .between(表别名.列名, java属性值/常量值)    // 传入Array或List, 长度应该是2
-    .notBetween(表别名.列名, java属性值/常量值) // 传入Array或List, 长度应该是2
-    .sqlStrPart(自定义sql字符串片段) //追加到where条件尾部(数据权限sql片段)
+    .where(w -> w
+        .eq(表别名.列名, java属性值/常量值)
+        .ne(表别名.列名, java属性值/常量值)
+        .lt(表别名.列名, java属性值/常量值)
+        .lte(表别名.列名, java属性值/常量值)
+        .gt(表别名.列名, java属性值/常量值)
+        .gte(表别名.列名, java属性值/常量值)
+        .isNull(表别名.列名) // 不需要传值
+        .isNotNull(表别名.列名) // 不需要传值
+        .startsWith(表别名.列名, java属性值/常量值)
+        .contains(表别名.列名, java属性值/常量值)
+        .endsWith(表别名.列名, java属性值/常量值)
+        .notStartsWith(表别名.列名, java属性值/常量值)
+        .notContains(表别名.列名, java属性值/常量值)
+        .notEndsWith(表别名.列名, java属性值/常量值)
+        .in(表别名.列名, java属性值/常量值)         // 传入List
+        .notIn(表别名.列名, java属性值/常量值)      // 传入List
+        .between(表别名.列名, java属性值/常量值)    // 传入List, 长度应该是2
+        .notBetween(表别名.列名, java属性值/常量值) // 传入List, 长度应该是2
+        .sqlStrPart(自定义sql字符串片段)) //追加到where条件尾部(数据权限sql片段)
     // 以下这些 也是可有可无，跟原生sql写法别无二致
     .groupBy(表别名.列名)
-    .having(表别名.列名 操作符 值 [AND/OR] [表别名.列名 操作符 值])
+    .having(写法与where一致)
     .orderBy(表别名.列名 ASC[,表别名.列名 DESC])
     // build可以不写, 照顾用习惯lombok的人(不build一下,可能浑身不自在)
     .build();
@@ -132,20 +133,27 @@ sevice层的方法中
  
     // 像原生sql一样简单. 也可以原生sql一样写到很复杂
     
-    Object createTime = jobLog.getParams("createTime"); //传进来是创建起止时间的数组
+    // 模拟接收到的请求参数
+    SysUser user = new SysUser();
+    user.setUsername("system");
+    user.setNickname("eye");
+    user.setCreateTime(new DateTime());
+    user.putParam("ids", Arrays.asList(1L, 2L, 3L));
+    user.putParam("ages",Arrays.asList(20, 40));
 
-    NativeSqlQuery nativeSql = NativeSqlQuery.builder()
-        .select("tjl.*")
-        .from("t_job_log tjl")
-        .eq("tjl.bean_name", jobLog.getBeanName())
-        .eq("tjl.method_name", jobLog.getMethodName())
-        .contains("tjl.parameter", jobLog.getParameter())
-        .eq("tjl.status", jobLog.getStatus())
-        .between("date_format(tjl.create_time,'%Y-%m-%d')", createTime)
-        .orderBy("tjl.id")
-        .build();
+    NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
+            .select("u.id, u.username")
+            .from("sys_user u")
+            .where(w -> w.eq("u.username", user.getUsername())
+                .contains("u.nickname", user.getNickname())
+                .lt("u.create_time", new Date())
+                .in("u.id", (List)user.getParams("ids"))
+                .between("u.age", (List)user.getParams("ages")))
+            .groupBy("u.id")
+            .orderBy("u.id");
 
-    return dao.findAllByNativeSql(nativeSql, JobLog.class, pageRequest);
+    List<SysUser> allBySQL = dao.findAllBySql(nativeSqlQuery, SysUser.class);
+    //Page<SysUser> allBySQL = dao.findAllBySql(nativeSql, SysUser.class, pageRequest);
     
 ```
 
