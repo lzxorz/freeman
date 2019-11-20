@@ -1,6 +1,7 @@
 package com.freeman.sys.service;
 
 import com.freeman.common.base.service.IBaseService;
+import com.freeman.spring.data.utils.request.QueryRequest;
 import com.freeman.sys.domain.SysDict;
 import com.freeman.sys.domain.SysDictItem;
 import org.springframework.data.domain.Page;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface ISysDictService extends IBaseService<SysDict, Long> {
 
-    Page<SysDict> findAll(SysDict dict, Pageable pageable);
+    Page<SysDict> findAll(SysDict dict, QueryRequest queryRequest);
 
     void deleteByIds(Long[] dictIds);
 

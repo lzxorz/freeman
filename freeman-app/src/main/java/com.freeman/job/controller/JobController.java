@@ -31,7 +31,7 @@ public class JobController extends BaseController {
     @GetMapping
     @RequiresPermissions("job:view")
     public R jobList(QueryRequest request, Job job) {
-        return R.ok(jobService.findPage(request, job));
+        return R.ok(jobService.findPage(job,request));
     }
 
     @GetMapping("cron/check")

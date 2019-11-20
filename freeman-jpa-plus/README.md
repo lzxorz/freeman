@@ -116,14 +116,14 @@ NativeSqlQuery nativeSql = NativeSqlQuery.builder()
     .groupBy(表别名.列名)
     .having(写法与where一致)
     .orderBy(表别名.列名 ASC[,表别名.列名 DESC])
-    // build可以不写, 照顾用习惯lombok的人(不build一下,可能浑身不自在)
+    .orderBy( queryRequest.getOrderBy(表别名) ) // 排序参数如果是前端传进来,用QueryRequest接收的
+    // build可以不写
     .build();
 
     // nativeSql
     // pojo.class  普通的java类即可，列名(下划线连接==自动转换==>驼峰命名，去匹配java类的属性)
-    // pageRequest 需要分页,可传入. pageRequest对象中有排序的Sort数据会无视(请用orderBy()排序)
     // 返回List<pojo>或Page<pojo>
-    dao.findAllByNativeSql(nativeSql, JobLog.class, pageRequest);
+    dao.findAllByNativeSql(nativeSql, JobLog.class, queryRequest.getPageNo(), queryRequest.getPageSize());
 ```
 
 ### jpa-plus用法示例
@@ -153,7 +153,7 @@ sevice层的方法中
             .orderBy("u.id");
 
     List<SysUser> allBySQL = dao.findAllBySql(nativeSqlQuery, SysUser.class);
-    //Page<SysUser> allBySQL = dao.findAllBySql(nativeSql, SysUser.class, pageRequest);
+    //Page<SysUser> allBySQL = dao.findAllBySql(nativeSql, SysUser.class, queryRequest.getPageNo(), queryRequest.getPageSize());
     
 ```
 
@@ -163,27 +163,42 @@ sevice层的方法中
 **QueryRequest**
 
 查询请求,很多时候需要 分页参数、排序参数, Controller层方法的形参写上`QueryRequest`, 自动接收分页和排序参数;
+分页参数有默认备用值`pageNo`=1,`pageSize`=20;
+
+排序字段可以设置默认备用值`QueryRequest#defaultSort("默认排序属性名称", 是否升序)`;
+
 查询需要PageRequest对象,只需要调用一下`getPageRequest()`, 查询需要Sort对象,只需要调用一下`getSort()`;
-调用getPageRequest()时, 分页参数有默认备用值`pageNo`=0,`pageSize`=20;
-排序字段可以设置默认备用值`QueryRequest#setDefaultSortField("默认排序属性名称", 是否升序)`;
+
+使用 NativeSqlQuery查询 同样简单, `queryRequest.getPageNo()`、`queryRequest.getPageSize()`、`queryRequest.getOrderBy(表列名)`;
+
 
 Service代码片段示例:
 
 ```java
-// 如果没接收到分页参数, 有默认备用值`pageNo`=0,`pageSize`=20;
+// 如果没接收到分页参数, 有默认备用值`pageNo`=1,`pageSize`=20;
 PageRequest pageRequest = queryRequest.getPageRequest();
 
-//  如果没接收到排序参数, setDefaultSortField设置的默认值 生效
-PageRequest pageRequest = queryRequest.setDefaultSortField("createTime", false).getPageRequest();
+//  如果没接收到排序参数, defaultSortField设置的默认值 生效
+PageRequest pageRequest = queryRequest.defaultSortField("createTime", false).getPageRequest();
 
 dao.findAll(pageRequest);
 
 // 虽然使用 QueryRequest 接收 参数了, 但是只需要排序 不需要分页
-Sort sort = queryRequest.setDefaultSortField("createTime", false).getSort();
-
+Sort sort = queryRequest.defaultSortField("createTime", false).getSort();
 // queryRequest.getSort(); // 当然 也可以 不设置 默认排序字段
 
 dao.findAll(sort);
+
+// NativeSqlQuery
+NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
+            .select(XXX).from(XXX)
+            .where(w -> w.eq(XXX).contains(XXX).lt(XXX).in(XXX).between(XXX))
+            .groupBy(XXX)
+            .orderBy(queryRequest.getOrderBy(表列名));
+
+Page<SysUser> allBySQL = dao.findAllBySql(nativeSql, SysUser.class, queryRequest.getPageNo(), queryRequest.getPageSize());
+
+
 ```
 ---
 
@@ -195,8 +210,8 @@ PageUtil可以更简单构建多字段排序的PageRequest。
 代码片段示例:
 
 ```java
-// 如果需要分页参数, PageUtil有默认备用值`pageNo`=0,`pageSize`=20;
-PageRequest pageRequest = PageUtil.builder().pageNo(0).pageSize(50).asc("age").desc("createTime").build();
+// 如果需要分页参数, PageUtil有默认备用值`pageNo`=1,`pageSize`=20;
+PageRequest pageRequest = PageUtil.builder().pageNo(1).pageSize(50).asc("age").desc("createTime").build();
 
 // 如果只需要分页 不需要排序 // 应该用jpa 自带写法
 PageRequest pageRequest = PageRequest.of(1,30);

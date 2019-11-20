@@ -146,7 +146,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
     }
 
     @Override
-    public Page findAllBySql(NativeSqlQuery nativeSql, Class<?> resultClass, Pageable pageable) {
+    public Page findAllBySql(NativeSqlQuery nativeSql, Class<?> resultClass, Integer pageNo, Integer pageSize) {
         String sqlStr = nativeSql.toSqlStr();
 
         //获取总记录数
@@ -161,15 +161,15 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 
         long totalRecord = ((Number) countQuery.getSingleResult()).longValue();
         List result = totalRecord == 0 ? new ArrayList<>(0) :
-            pageQuery.setFirstResult((int) pageable.getOffset())
-                .setMaxResults(pageable.getPageSize())
+            pageQuery.setFirstResult(pageNo-1)
+                .setMaxResults(pageSize)
                 .unwrap(NativeQueryImpl.class)
                 .setResultTransformer(new AliasToBeanTransformer(resultClass))
                 // .setResultTransformer(Transformers.aliasToBean(resultClass))
                 // .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
                 .list();
         
-        return new PageImpl<>(result,pageable,totalRecord);
+        return new PageImpl<>(result,PageRequest.of(pageNo-1, pageSize),totalRecord);
     }
 
 

@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 
 public interface ISysLogService extends IBaseService<SysLog, Long> {
 
-    Page<SysLog> findPage(QueryRequest queryRequest, SysLog sysLog);
+    Page<SysLog> findPage(SysLog sysLog, QueryRequest queryRequest);
 
     @Async
     void saveLog(ProceedingJoinPoint point, SysLog log) throws JsonProcessingException;

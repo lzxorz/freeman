@@ -208,7 +208,7 @@ node,yarn
     - 可以用docker, 上传文件到服务器,在服务器上构建镜像(请查看freeman-app/Dockerfile中的注释内容)
     
 前端 freeman-ant-design-vue
-- 确认修改正确`.env.production`配置文件中`VUE_APP_URL`
+- 确认修改正确`src.utils.request.js`文件中`baseURL`
 - 在freeman-ant-design-vue目录终端执行yarn命令 `yarn build`
 - 生成的dist目录下的所有文件放到静态web服务器中即可
 

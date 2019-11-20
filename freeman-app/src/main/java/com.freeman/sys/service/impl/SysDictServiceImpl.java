@@ -7,6 +7,7 @@ import com.freeman.common.cache.redis.JedisDao;
 import com.freeman.common.constants.Constants;
 import com.freeman.common.utils.StrUtil;
 import com.freeman.spring.data.repository.NativeSqlQuery;
+import com.freeman.spring.data.utils.request.QueryRequest;
 import com.freeman.sys.domain.SysDict;
 import com.freeman.sys.domain.SysDictItem;
 import com.freeman.sys.domain.SysRole;
@@ -38,11 +39,11 @@ public class SysDictServiceImpl extends BaseServiceImpl<SysDictRepository, SysDi
 
 
     @Override
-    public Page<SysDict> findAll(SysDict dict, Pageable pageable) {
+    public Page<SysDict> findAll(SysDict dict, QueryRequest queryRequest) {
         NativeSqlQuery nativeSqlQuery = NativeSqlQuery.builder()
                 .from("sys_dict")
                 .where(w -> w.eq("name", dict.getName()));
-        return dao.findAllBySql(nativeSqlQuery, SysDict.class, pageable);
+        return dao.findAllBySql(nativeSqlQuery, SysDict.class, queryRequest.getPageNo(), queryRequest.getPageSize());
     }
 
 

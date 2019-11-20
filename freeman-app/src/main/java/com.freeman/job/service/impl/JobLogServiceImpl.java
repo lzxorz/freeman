@@ -22,7 +22,7 @@ public class JobLogServiceImpl extends BaseServiceImpl<JobLogRepository, JobLog,
 
     /** 调度日志 */
     @Override
-    public Page<JobLog> findPage(QueryRequest queryRequest, JobLog jobLog) {
+    public Page<JobLog> findPage(JobLog jobLog, QueryRequest queryRequest) {
 
         PageRequest pageRequest = queryRequest.getPageRequest();
 
@@ -36,7 +36,7 @@ public class JobLogServiceImpl extends BaseServiceImpl<JobLogRepository, JobLog,
             .eq( "status", jobLog.getStatus())
             .between( "date_format(create_time,'%Y-%m-%d')", (List)createTime));
 
-        return dao.findAllBySql(nativeSql, JobLog.class, pageRequest);
+        return dao.findAllBySql(nativeSql, JobLog.class, queryRequest.getPageNo(), queryRequest.getPageSize());
     }
 
 

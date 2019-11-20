@@ -35,7 +35,7 @@ public class SysLogServiceImpl extends BaseServiceImpl<SysLogRepository, SysLog,
     ObjectMapper objectMapper;
 
     @Override
-    public Page<SysLog> findPage(QueryRequest queryRequest, SysLog sysLog) {
+    public Page<SysLog> findPage(SysLog sysLog, QueryRequest queryRequest) {
 
         PageRequest pageRequest = queryRequest.getPageRequest();
         Object createTime = sysLog.getParams("createTime"); //传进来是数组
@@ -48,7 +48,7 @@ public class SysLogServiceImpl extends BaseServiceImpl<SysLogRepository, SysLog,
                 .between( "date_format(create_time,'%Y-%m-%d')", (List)createTime))
                 .build();
 
-        return dao.findAllBySql(nativeSql, SysLog.class, pageRequest);
+        return dao.findAllBySql(nativeSql, SysLog.class, queryRequest.getPageNo(), queryRequest.getPageSize());
     }
 
     @Override

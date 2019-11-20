@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 
 public interface IJobService extends IBaseService<Job,Long> {
 
-    Page<Job> findPage(QueryRequest queryRequest, Job job);
+    Page<Job> findPage(Job job, QueryRequest queryRequest);
 
     int updateBatch(String jobIds, String status);
 

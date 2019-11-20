@@ -32,7 +32,7 @@ public class SysLogController extends BaseController {
    @GetMapping
    @RequiresPermissions("log:view")
    public R logList(QueryRequest queryRequest, SysLog sysLog) {
-       Page<SysLog> all = logService.findPage(queryRequest,sysLog);
+       Page<SysLog> all = logService.findPage(sysLog,queryRequest);
        return R.ok(all);
    }
 

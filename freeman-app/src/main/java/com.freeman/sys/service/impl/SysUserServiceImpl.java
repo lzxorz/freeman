@@ -8,6 +8,7 @@ import com.freeman.common.constants.Constants;
 import com.freeman.common.dataSource.DbSource;
 import com.freeman.common.utils.BeanUtil;
 import com.freeman.spring.data.repository.NativeSqlQuery;
+import com.freeman.spring.data.utils.request.QueryRequest;
 import com.freeman.sys.domain.SysUser;
 import com.freeman.sys.domain.SysUserRole;
 import com.freeman.sys.repository.SysUserRepository;
@@ -48,7 +49,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserRepository, SysUs
 
 
     @Override @DbSource
-    public Page<SysUser> findAll(SysUser user, Pageable pageable) {
+    public Page<SysUser> findAll(SysUser user, QueryRequest queryRequest) {
 
         Object createTime = user.getParams("createTime"); //传进来是数组
 
@@ -65,7 +66,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserRepository, SysUs
             .groupBy("su.id")
             .build();
 
-        return dao.findAllBySql(nativeSql, SysUser.class, pageable);
+        return dao.findAllBySql(nativeSql, SysUser.class, queryRequest.getPageNo(), queryRequest.getPageSize());
     }
 
 

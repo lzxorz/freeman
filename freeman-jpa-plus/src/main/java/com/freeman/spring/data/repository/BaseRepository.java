@@ -57,7 +57,7 @@ public interface BaseRepository<T, ID extends Serializable> extends PagingAndSor
 
     List findAllBySql(String sql, Class<?> clazz, Object... params);
     List findAllBySql(NativeSqlQuery nativeSql, Class<?> resultClass);
-    Page findAllBySql(NativeSqlQuery nativeSql, Class<?> resultClass, Pageable page);
+    Page findAllBySql(NativeSqlQuery nativeSql, Class<?> resultClass, Integer pageNo, Integer pageSize);
 
     long countByQL(final String ql, final Object... params);
 

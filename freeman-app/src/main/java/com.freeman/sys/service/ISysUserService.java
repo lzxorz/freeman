@@ -1,6 +1,7 @@
 package com.freeman.sys.service;
 
 import com.freeman.common.base.service.IBaseService;
+import com.freeman.spring.data.utils.request.QueryRequest;
 import com.freeman.sys.domain.SysUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface ISysUserService extends IBaseService<SysUser,Long> {
 
-    Page<SysUser> findAll(SysUser entity, Pageable pageable);
+    Page<SysUser> findAll(SysUser entity, QueryRequest queryRequest);
     /**
      * 通过用户名查找用户
      *

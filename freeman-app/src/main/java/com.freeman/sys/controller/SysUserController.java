@@ -43,7 +43,7 @@ public class SysUserController extends BaseController {
     @GetMapping
     @RequiresPermissions("user:view")
     public R userList(SysUser user, QueryRequest queryRequest) {
-        Page<SysUser> page = userService.findAll(DataPermUtil.dataScopeFilter(user), queryRequest.getPageRequest());
+        Page<SysUser> page = userService.findAll(DataPermUtil.dataScopeFilter(user), queryRequest);
         return R.ok("获取成功", page);
     }
 

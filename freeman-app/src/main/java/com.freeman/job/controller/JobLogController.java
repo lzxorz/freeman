@@ -28,7 +28,7 @@ public class JobLogController extends BaseController {
     @GetMapping
     @RequiresPermissions("jobLog:view")
     public R jobLogList(QueryRequest request, JobLog log) {
-        return R.ok(this.jobLogService.findPage(request, log));
+        return R.ok(this.jobLogService.findPage(log,request));
     }
 
     // 删除调度日志

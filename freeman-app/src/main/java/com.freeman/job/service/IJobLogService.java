@@ -7,5 +7,5 @@ import com.freeman.spring.data.utils.request.QueryRequest;
 import org.springframework.data.domain.Page;
 
 public interface IJobLogService extends IBaseService<JobLog,Long> {
-    Page<JobLog> findPage(QueryRequest queryRequest, JobLog jobLog);
+    Page<JobLog> findPage(JobLog jobLog, QueryRequest queryRequest);
 }

@@ -21,7 +21,7 @@ public class NativeSqlQuery {
 
     private String groupBy;       //
     private Criterion having;     //
-    private String orderBy;       // nativeSqlQuery.orderBy("字段 asc,字段 desc"). 注意: 使用这个条件查询构造器时,pageable对象中的排序无效。
+    private StringJoiner orderBy; //
 
     private int  counts = 0;      // 占位符计数器 ?1 ?2 ?3
     private List params;          // 占位符对应的参数值
@@ -44,7 +44,10 @@ public class NativeSqlQuery {
         return this;
     }
 
-    /** where */
+    /**
+     * where
+     * 使用方式: nativeSql.where(w -> w.eq().ne().in())
+     */
     public NativeSqlQuery where(UnaryOperator<Criterion> func) {
         this.where = func.apply(new Criterion(Criterion.Operator.AND)); // 条件之间 用 and 连接
         return this;
@@ -55,14 +58,28 @@ public class NativeSqlQuery {
         this.groupBy = groupBySegment;
         return this;
     }
-    /** having */
+
+    /**
+     * having
+     * 使用方式: nativeSql.having(h -> h.eq().ne().in())
+     * */
     public NativeSqlQuery having(UnaryOperator<Criterion> func){
         this.having = func.apply(new Criterion(Criterion.Operator.AND)); // 条件之间 用 and 连接
         return this;
     }
-    /** orderBy */
+
+    /**
+     * orderBy
+     * 排序参数如果是前端传进来,用QueryRequest接收的 ===> nativeSql.orderBy( queryRequest.getOrderBy(表别名) )
+     * 手写逻辑指定排序字段 ==> nativeSql.orderBy("su.age asc")
+     */
     public NativeSqlQuery orderBy(String orderBySegment){
-        this.orderBy = orderBySegment;
+        if (StrUtil.isNotBlank(orderBySegment)) {
+            if (orderBy == null){
+                orderBy = new StringJoiner(","); //  多次调用此方法,用逗号拼接 ==> su.age asc,so.create_time desc
+            }
+            this.orderBy = this.orderBy.add(orderBySegment);
+        }
         return this;
     }
 
@@ -103,8 +120,8 @@ public class NativeSqlQuery {
             }
         }
 
-        if (StrUtil.isNotBlank(orderBy)) {
-            sj.add(StrUtil.format("ORDER BY {}", orderBy));
+        if (orderBy != null){
+            sj.add(StrUtil.format("ORDER BY {}", orderBy.toString()));
         }
         return sj.toString();
     }

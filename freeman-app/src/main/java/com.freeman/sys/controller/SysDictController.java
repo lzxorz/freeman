@@ -32,7 +32,7 @@ public class SysDictController extends BaseController {
    @GetMapping
    @RequiresPermissions("dict:view")
    public R DictList(QueryRequest queryRequest, SysDict dict) {
-       Page<SysDict> page = dictService.findAll(dict, queryRequest.getPageRequest());
+       Page<SysDict> page = dictService.findAll(dict, queryRequest);
        return R.ok(page);
    }
 

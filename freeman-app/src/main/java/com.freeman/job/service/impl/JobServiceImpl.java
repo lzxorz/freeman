@@ -51,9 +51,7 @@ public class JobServiceImpl extends BaseServiceImpl<JobRepository, Job,Long> imp
 
     /** 获取任务 */
     @Override
-    public Page<Job> findPage(QueryRequest queryRequest, Job job) {
-
-        PageRequest pageRequest = queryRequest.getPageRequest();
+    public Page<Job> findPage(Job job, QueryRequest queryRequest) {
 
         Object createTime = job.getParams("createTime"); //传进来是数组
 
@@ -67,7 +65,7 @@ public class JobServiceImpl extends BaseServiceImpl<JobRepository, Job,Long> imp
                 .eq( "status", job.getStatus())
                 .between( "date_format(create_time,'%Y-%m-%d')", (List)createTime));
 
-        return dao.findAllBySql(nativeSql, Job.class, pageRequest);
+        return dao.findAllBySql(nativeSql, Job.class, queryRequest.getPageNo(), queryRequest.getPageSize());
     }
 
 
