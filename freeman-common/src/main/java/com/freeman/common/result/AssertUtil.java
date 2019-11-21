@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 /**
  * 断言工具类
  * @author 刘志新
+ * 使用方式示例: AssertUtil.PARAM_INVALID.isNull(变量, "参数校验失败，不能为空");
  */
 @Getter
 @AllArgsConstructor
@@ -35,6 +36,8 @@ public enum AssertUtil implements Assert {
     HttpMessageNotWritableException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ""), // 500
     AsyncRequestTimeoutException(HttpServletResponse.SC_SERVICE_UNAVAILABLE, ""), // 503
 
+    SUCCESS(200,"成功"),
+
     UNAUTHORIZED(4001, "未认证"),
     LOCKSCREEN(4002, "用户锁屏"),
     AUTHORIZED_FAIL(4003, "没有访问权限"),
@@ -42,6 +45,7 @@ public enum AssertUtil implements Assert {
     PARAM_INVALID(4006, "参数校验失败"),
     LIMIT_ACCESS_ERROR(4007, "接口访问超出频率限制"),
 
+    UNKNOWN_ERROR(500, "服务器繁忙,请稍后重试"),
     UPLOAD_FILE(5005, "上传文件出错");
 
 
@@ -50,16 +54,15 @@ public enum AssertUtil implements Assert {
     /** 返回消息 */
     private String message;
 
-
     @Override
-    public FMException builderException(Object... args) {
+    public BizException builderException(Object... args) {
         String msg = MessageFormat.format(this.getMessage(), args);
-        return new FMException(this, args, msg);
+        return new BizException(this, args, msg);
     }
 
     @Override
-    public FMException builderException(Throwable t, Object... args) {
+    public BizException builderException(Throwable t, Object... args) {
         String msg = MessageFormat.format(this.getMessage(), args);
-        return new FMException(this, args, msg, t);
+        return new BizException(this, args, msg, t);
     }
 }

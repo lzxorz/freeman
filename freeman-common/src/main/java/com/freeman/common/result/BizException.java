@@ -7,7 +7,7 @@ import lombok.Getter;
  *
  */
 @Getter
-public class FMException extends RuntimeException {
+public class BizException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,23 +17,23 @@ public class FMException extends RuntimeException {
     protected Object[] args;
 
 
-    public FMException(Assert anAssert) {
+    public BizException(Assert anAssert) {
         super(anAssert.getMessage());
         this.code = anAssert.getCode();
     }
 
-    public FMException(int code, String msg) {
+    public BizException(int code, String msg) {
         super(msg);
         this.code = code;
     }
 
-    public FMException(Assert anAssert, Object[] args, String message) {
+    public BizException(Assert anAssert, Object[] args, String message) {
         super(message);
         this.code = anAssert.getCode();
         this.args = args;
     }
 
-    public FMException(Assert anAssert, Object[] args, String message, Throwable cause) {
+    public BizException(Assert anAssert, Object[] args, String message, Throwable cause) {
         super(message, cause);
         this.code = anAssert.getCode();
         this.args = args;

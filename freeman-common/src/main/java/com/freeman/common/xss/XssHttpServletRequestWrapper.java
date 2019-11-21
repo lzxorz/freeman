@@ -1,7 +1,5 @@
 package com.freeman.common.xss;
 
-import com.freeman.common.utils.JsoupUtil;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 

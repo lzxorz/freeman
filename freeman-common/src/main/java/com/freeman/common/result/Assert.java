@@ -7,8 +7,14 @@ import java.util.Map;
 
 
 /**
- * <p>枚举类异常断言，提供简便的方式判断条件，并在条件满足时抛出异常</p>
- * <p>错误码和错误信息定义在枚举类中，在本断言方法中，传递错误信息需要的参数</p>
+ * 项目中使用子类 AssertUtil
+ *
+ * <p>异常断言，提供简便的方式进行判断，并在条件满足时抛出异常</p>
+ * <p>错误码和错误信息定义在枚举类中，在断言方法中，传递错误信息需要的参数</p>
+ *
+ * @author liuzhixin
+ * @email  lzxorz@163.com
+ *
  * https://www.javazhiyin.com/40384.html
  * https://elim.iteye.com/blog/2392583
  * https://my.oschina.net/chkui/blog/1923011
@@ -22,11 +28,11 @@ public interface Assert {
     String getMessage();
 
     /** 构建异常对象 */
-    FMException builderException(Object... args);
+    BizException builderException(Object... args);
 
     /**
      * 构建异常对象 */
-    FMException builderException(Throwable t, Object... args);
+    BizException builderException(Throwable t, Object... args);
 
 
     /** 不是true, 抛异常　*/

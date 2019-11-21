@@ -3,7 +3,7 @@ package com.freeman.common.advice;
 
 import cn.hutool.core.date.DateUtil;
 import com.freeman.common.result.AssertUtil;
-import com.freeman.common.result.FMException;
+import com.freeman.common.result.BizException;
 import com.freeman.common.result.i18n.UnifiedMessageSource;
 import com.freeman.common.result.R;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class RestCtrlAdvice {
     private UnifiedMessageSource unifiedMessageSource;
 
     /** 获取国际化消息 */
-    public String getMessage(FMException e) {
+    public String getMessage(BizException e) {
         String code = "response." + e.getCode();
         String message = unifiedMessageSource.getMessage(code, e.getArgs());
 
@@ -132,8 +132,8 @@ public class RestCtrlAdvice {
     }
 
     /** 自定义异常 */
-    @ExceptionHandler(value = FMException.class)
-    public R handleBaseException(FMException e) {
+    @ExceptionHandler(value = BizException.class)
+    public R handleBaseException(BizException e) {
         log.error(e.getMessage(), e);
         return new R(e.getCode(), getMessage(e));
     }

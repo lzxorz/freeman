@@ -86,44 +86,32 @@ public class R {
         return pageInfo;
     }
 
-    public enum E {
-        SUCCESS(200,"成功"),
-        UNKNOWN_ERROR(500, "服务器繁忙,请稍后重试");
 
-        private int code;
-        private String message;
-        E(int code, String message) {
-            this.code = code;
-            this.message = message;
-        }
-        public int getCode(){ return this.code; }
-        public String getMessage(){ return this.message; }
-    }
     /** 快捷方式--成功 */
     public static R ok() {
-        return new R(E.SUCCESS.code, E.SUCCESS.getMessage());
+        return new R(AssertUtil.SUCCESS.getCode(), AssertUtil.SUCCESS.getMessage());
     }
     public static R ok(String message) {
-        return new R(E.SUCCESS.getCode(), message);
+        return new R(AssertUtil.SUCCESS.getCode(), message);
     }
     public static R ok(Object data) {
-        return new R(E.SUCCESS.getCode(), E.SUCCESS.getMessage()).setData(data);
+        return new R(AssertUtil.SUCCESS.getCode(), AssertUtil.SUCCESS.getMessage()).setData(data);
     }
     public static R ok(String message, Object data) {
-        return new R(E.SUCCESS.getCode(),message).setData(data);
+        return new R(AssertUtil.SUCCESS.getCode(),message).setData(data);
     }
     /** 快捷方式--失败 */
     public static R error() {
-        return new R(E.UNKNOWN_ERROR.getCode(),E.UNKNOWN_ERROR.getMessage());
+        return new R(AssertUtil.UNKNOWN_ERROR.getCode(),AssertUtil.UNKNOWN_ERROR.getMessage());
     }
     public static R error(String message) {
-        return new R(E.UNKNOWN_ERROR.getCode(),message);
+        return new R(AssertUtil.UNKNOWN_ERROR.getCode(),message);
     }
     public static R error(Object data) {
-        return new R(E.UNKNOWN_ERROR.getCode(),E.UNKNOWN_ERROR.getMessage()).setData(data);
+        return new R(AssertUtil.UNKNOWN_ERROR.getCode(),AssertUtil.UNKNOWN_ERROR.getMessage()).setData(data);
     }
     public static R error(String message, Object data) {
-        return new R(E.UNKNOWN_ERROR.getCode(),message).setData(data);
+        return new R(AssertUtil.UNKNOWN_ERROR.getCode(),message).setData(data);
     }
 
 
