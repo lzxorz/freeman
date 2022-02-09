@@ -58,7 +58,7 @@
         <jsoup.version>1.9.1</jsoup.version>
         <metadata-extractor.version>2.9.1</metadata-extractor.version>
         <blade-patchca.version>1.0.5</blade-patchca.version>
-        <shiro-spring.version>1.4.1</shiro-spring.version>
+        <shiro-spring.version>1.7.1</shiro-spring.version>
         <shiro-redis.version>3.2.3</shiro-redis.version>
         <java-jwt.version>3.8.1</java-jwt.version>
         <oltu-oauth2.version>1.0.2</oltu-oauth2.version>
