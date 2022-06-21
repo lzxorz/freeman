@@ -48,7 +48,7 @@
         <guava.version>27.1-jre</guava.version>
         <jackson.version>2.9.8</jackson.version>
         <fastjson.version>1.2.58</fastjson.version>
-        <mysql-connector-java.version>8.0.16</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <druid.version>1.1.16</druid.version>
         <p6spy.version>3.8.1</p6spy.version>
         <!--<commons-email.version>1.4</commons-email.version>-->
